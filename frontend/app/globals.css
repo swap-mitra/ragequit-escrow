@@ -1,0 +1,129 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top, #f3f8ff 0%, #edf2f9 40%, #e5ebf3 100%);
+  color: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.page-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.hero-card,
+.panel {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.tagline {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: #0c4a6e;
+  font-weight: 700;
+}
+
+h1,
+h2 {
+  margin: 0.5rem 0;
+}
+
+p {
+  margin: 0.5rem 0;
+}
+
+.subtle {
+  color: #475569;
+}
+
+.wallet-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+button {
+  border: 1px solid #1d4ed8;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 0.55rem 0.45rem;
+  font-size: 0.9rem;
+}
+
+.status-chip {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status-vetoed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-executed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pending {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+@media (max-width: 640px) {
+  .page-wrap {
+    padding: 1rem 0.75rem 2rem;
+  }
+
+  th,
+  td {
+    font-size: 0.8rem;
+  }
+}

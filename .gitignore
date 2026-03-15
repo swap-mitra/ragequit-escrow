@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.local
+.DS_Store
+coverage/
+.cache/
+artifacts/
+cache/
+out/
+.next/
+frontend/.next/
+contracts/artifacts/
+contracts/cache/

@@ -1,0 +1,18 @@
+{
+  "name": "ragequit-escrow",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "contracts",
+    "frontend"
+  ],
+  "scripts": {
+    "contracts:compile": "npm --workspace contracts run compile",
+    "contracts:test": "npm --workspace contracts run test",
+    "contracts:node": "npm --workspace contracts run node",
+    "contracts:deploy:local": "npm --workspace contracts run deploy:local",
+    "contracts:keeper": "npm --workspace contracts run keeper",
+    "frontend:dev": "npm --workspace frontend run dev",
+    "frontend:build": "npm --workspace frontend run build"
+  }
+}
