@@ -1,6 +1,8 @@
 # RageQuit Escrow
 
-Day 1-2 implementation from `RageQuitEscrow_BuildPlan.docx`.
+RageQuit Escrow is a smart-contract payment control layer for AI agents. An agent can queue a payment, the human operator gets a bounded veto window, and the payment executes only if the human does nothing. The goal is to make autonomous payments revocable at the edge without relying on offchain policy alone.
+
+The repo contains the escrow contract, keeper flow, notification hooks, and dashboard needed to monitor pending payments and stop suspicious ones before execution.
 
 ## Monorepo layout
 
