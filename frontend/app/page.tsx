@@ -8,14 +8,17 @@ export default function HomePage() {
         <p className="tagline">Rage Quit Escrow</p>
         <h1>Human-vetoed autonomous payments</h1>
         <p>
-          Day 1 scaffold: wallet connection + pending-payment board wired to the escrow contract for read-only visibility.
+          Day 2 build: wallet connection, pending-payment feed, countdown timers, and owner-only one-click veto.
         </p>
         <ConnectWallet />
       </section>
 
       <section className="panel">
         <h2>Pending Payments</h2>
-        <p className="subtle">Showing the most recent queued payments and countdown to execution window expiry.</p>
+        <p className="subtle">
+          Latest queued payments from the escrow contract. Veto is enabled only for the escrow owner within the active
+          veto window.
+        </p>
         <PendingPayments />
       </section>
     </main>

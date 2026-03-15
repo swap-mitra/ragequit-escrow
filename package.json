@@ -11,7 +11,10 @@
     "contracts:test": "npm --workspace contracts run test",
     "contracts:node": "npm --workspace contracts run node",
     "contracts:deploy:local": "npm --workspace contracts run deploy:local",
+    "contracts:deploy:sepolia": "npm --workspace contracts run deploy:sepolia",
     "contracts:keeper": "npm --workspace contracts run keeper",
+    "contracts:watch:telegram:local": "npm --workspace contracts run watch:telegram:local",
+    "contracts:watch:telegram:sepolia": "npm --workspace contracts run watch:telegram:sepolia",
     "frontend:dev": "npm --workspace frontend run dev",
     "frontend:build": "npm --workspace frontend run build"
   }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useReadContract, useReadContracts } from "wagmi";
+import {
+  useAccount,
+  useReadContract,
+  useReadContracts,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { rageQuitEscrowAbi } from "../lib/contracts/rageQuitEscrow";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
@@ -20,7 +26,11 @@ export function PendingPayments() {
   const configuredAddress = process.env.NEXT_PUBLIC_ESCROW_ADDRESS as `0x${string}` | undefined;
   const contractAddress = configuredAddress || ZERO_ADDRESS;
 
+  const { address, chain } = useAccount();
+
   const [now, setNow] = useState<bigint>(0n);
+  const [pendingVetoId, setPendingVetoId] = useState<bigint | null>(null);
+  const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const updateNow = () => {
@@ -33,7 +43,17 @@ export function PendingPayments() {
     return () => clearInterval(timer);
   }, []);
 
-  const { data: nextPaymentId, isLoading: nextPaymentLoading } = useReadContract({
+  const { data: ownerAddress } = useReadContract({
+    address: contractAddress,
+    abi: rageQuitEscrowAbi,
+    functionName: "owner",
+    query: {
+      enabled: Boolean(configuredAddress),
+      refetchInterval: 5000,
+    },
+  });
+
+  const { data: nextPaymentId, isLoading: nextPaymentLoading, refetch: refetchNextPaymentId } = useReadContract({
     address: contractAddress,
     abi: rageQuitEscrowAbi,
     functionName: "nextPaymentId",
@@ -57,7 +77,11 @@ export function PendingPayments() {
     return ids;
   }, [nextPaymentId]);
 
-  const { data: paymentResults, isLoading: paymentLoading } = useReadContracts({
+  const {
+    data: paymentResults,
+    isLoading: paymentLoading,
+    refetch: refetchPayments,
+  } = useReadContracts({
     contracts: paymentIds.map((id) => ({
       address: contractAddress,
       abi: rageQuitEscrowAbi,
@@ -69,6 +93,50 @@ export function PendingPayments() {
       refetchInterval: 5000,
     },
   });
+
+  const {
+    data: vetoHash,
+    error: vetoWriteError,
+    isPending: vetoWritePending,
+    writeContract,
+  } = useWriteContract();
+
+  const {
+    isLoading: vetoConfirming,
+    isSuccess: vetoConfirmed,
+    error: vetoConfirmError,
+  } = useWaitForTransactionReceipt({
+    hash: vetoHash,
+  });
+
+  useEffect(() => {
+    if (!vetoWriteError) {
+      return;
+    }
+
+    setActionMessage(vetoWriteError.message);
+    setPendingVetoId(null);
+  }, [vetoWriteError]);
+
+  useEffect(() => {
+    if (!vetoConfirmError) {
+      return;
+    }
+
+    setActionMessage(vetoConfirmError.message);
+    setPendingVetoId(null);
+  }, [vetoConfirmError]);
+
+  useEffect(() => {
+    if (!vetoConfirmed) {
+      return;
+    }
+
+    setActionMessage("Veto transaction confirmed.");
+    setPendingVetoId(null);
+    void refetchNextPaymentId();
+    void refetchPayments();
+  }, [vetoConfirmed, refetchNextPaymentId, refetchPayments]);
 
   if (!configuredAddress) {
     return <p className="subtle">Set `NEXT_PUBLIC_ESCROW_ADDRESS` to load pending payments.</p>;
@@ -94,8 +162,13 @@ export function PendingPayments() {
     return <p className="subtle">No readable payments returned by contract.</p>;
   }
 
+  const isOwner =
+    Boolean(address) && Boolean(ownerAddress) && address!.toLowerCase() === (ownerAddress as string).toLowerCase();
+
   return (
     <div className="table-wrap">
+      <p className="subtle">Connected wallet must match escrow owner to veto pending payments.</p>
+      {actionMessage ? <p className="subtle">{actionMessage}</p> : null}
       <table>
         <thead>
           <tr>
@@ -104,6 +177,7 @@ export function PendingPayments() {
             <th>Amount (wei)</th>
             <th>Time Left</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -123,6 +197,23 @@ export function PendingPayments() {
                 ? "status-chip status-executed"
                 : "status-chip status-pending";
 
+            const canVeto = isOwner && !vetoed && !executed && remaining > 0n;
+            const isCurrentVeto = pendingVetoId !== null && pendingVetoId === id;
+            const txInFlight = vetoWritePending || vetoConfirming;
+
+            let buttonText = "Veto";
+            if (isCurrentVeto && txInFlight) {
+              buttonText = "Vetoing...";
+            } else if (vetoed) {
+              buttonText = "Vetoed";
+            } else if (executed) {
+              buttonText = "Executed";
+            } else if (remaining === 0n) {
+              buttonText = "Window Closed";
+            } else if (!isOwner) {
+              buttonText = "Owner Only";
+            }
+
             return (
               <tr key={id.toString()}>
                 <td>{id.toString()}</td>
@@ -131,6 +222,31 @@ export function PendingPayments() {
                 <td>{remaining.toString()}s</td>
                 <td>
                   <span className={chipClass}>{status}</span>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    disabled={!canVeto || txInFlight}
+                    onClick={() => {
+                      if (!address || !chain) {
+                        setActionMessage("Connect a wallet to send veto transaction.");
+                        return;
+                      }
+
+                      setActionMessage(null);
+                      setPendingVetoId(id);
+                      writeContract({
+                        account: address,
+                        chain,
+                        address: contractAddress,
+                        abi: rageQuitEscrowAbi,
+                        functionName: "veto",
+                        args: [id],
+                      });
+                    }}
+                  >
+                    {buttonText}
+                  </button>
                 </td>
               </tr>
             );
