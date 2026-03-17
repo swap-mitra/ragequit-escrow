@@ -8,6 +8,10 @@
     "node": "hardhat node",
     "deploy:local": "hardhat run scripts/deploy.js --network localhost",
     "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "artifacts:local": "hardhat run scripts/generateAgentArtifacts.js --network localhost",
+    "artifacts:sepolia": "hardhat run scripts/generateAgentArtifacts.js --network sepolia",
+    "delegations:local": "hardhat run scripts/createDelegationBundle.js --network localhost",
+    "delegations:sepolia": "hardhat run scripts/createDelegationBundle.js --network sepolia",
     "keeper": "hardhat run scripts/keeper.js --network localhost",
     "watch:telegram:local": "hardhat run scripts/telegramWatcher.js --network localhost",
     "watch:telegram:sepolia": "hardhat run scripts/telegramWatcher.js --network sepolia"
@@ -16,5 +20,9 @@
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "dotenv": "^16.4.7",
     "hardhat": "^2.22.18"
+  },
+  "dependencies": {
+    "@metamask/smart-accounts-kit": "^0.4.0-beta.1",
+    "viem": "^2.47.4"
   }
 }

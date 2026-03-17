@@ -1,0 +1,33 @@
+{
+  "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
+  "name": "RageQuit Escrow",
+  "description": "Human-vetoed autonomous payment agent that queues payouts onchain and exposes a revocable execution window.",
+  "image": "http://localhost:3000/agent-avatar.svg",
+  "services": [
+    {
+      "name": "web",
+      "endpoint": "http://localhost:3000"
+    },
+    {
+      "name": "A2A",
+      "endpoint": "http://localhost:3000/agent.json",
+      "version": "0.3.0"
+    },
+    {
+      "name": "audit-log",
+      "endpoint": "http://localhost:3000/agent_log.json",
+      "version": "v1"
+    },
+    {
+      "name": "agentWallet",
+      "endpoint": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+    }
+  ],
+  "x402Support": false,
+  "active": true,
+  "registrations": [],
+  "supportedTrust": [
+    "reputation",
+    "validation"
+  ]
+}

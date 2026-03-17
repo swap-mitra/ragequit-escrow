@@ -1,0 +1,12 @@
+{
+  "type": "http://localhost:3000/schemas/agent-log-v1",
+  "generatedAt": "2026-03-17T00:00:00.000Z",
+  "network": "localhost",
+  "chainId": 31337,
+  "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "owner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+  "vetoWindowSeconds": "60",
+  "spendLimitWei": "1000000000000000000",
+  "decisions": []
+}

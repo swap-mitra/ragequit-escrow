@@ -1,3 +1,4 @@
+import { AgentAudit } from "../components/agent-audit";
 import { ConnectWallet } from "../components/connect-wallet";
 import { PendingPayments } from "../components/pending-payments";
 
@@ -20,6 +21,15 @@ export default function HomePage() {
           veto window.
         </p>
         <PendingPayments />
+      </section>
+
+      <section className="panel">
+        <h2>Agent Identity & Audit</h2>
+        <p className="subtle">
+          Day 3 build: ERC-8004 registration artifact, structured onchain decision logs, and delegation-ready agent
+          metadata.
+        </p>
+        <AgentAudit />
       </section>
     </main>
   );

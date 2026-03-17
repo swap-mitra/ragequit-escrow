@@ -2,6 +2,12 @@
 pragma solidity ^0.8.24;
 
 contract RageQuitEscrow {
+    enum DecisionType {
+        Queued,
+        Vetoed,
+        Executed
+    }
+
     struct PendingPayment {
         address agent;
         address recipient;
@@ -49,6 +55,16 @@ contract RageQuitEscrow {
         address indexed executor,
         address indexed recipient,
         uint256 amount,
+        uint256 timestamp
+    );
+    event PaymentDecisionLogged(
+        uint256 indexed paymentId,
+        DecisionType indexed decisionType,
+        address indexed actor,
+        address agent,
+        address recipient,
+        uint256 amount,
+        bytes32 intentHash,
         uint256 timestamp
     );
     event ConfigUpdated(
@@ -128,6 +144,9 @@ contract RageQuitEscrow {
         lockedBalance += amount;
 
         emit PaymentQueued(paymentId, msg.sender, recipient, amount, unlocksAt, intentHash);
+        emit PaymentDecisionLogged(
+            paymentId, DecisionType.Queued, msg.sender, msg.sender, recipient, amount, intentHash, block.timestamp
+        );
     }
 
     function veto(uint256 paymentId) external onlyOwner {
@@ -141,6 +160,16 @@ contract RageQuitEscrow {
         lockedBalance -= payment.amount;
 
         emit PaymentVetoed(paymentId, msg.sender, block.timestamp);
+        emit PaymentDecisionLogged(
+            paymentId,
+            DecisionType.Vetoed,
+            msg.sender,
+            payment.agent,
+            payment.recipient,
+            payment.amount,
+            payment.intentHash,
+            block.timestamp
+        );
     }
 
     function execute(uint256 paymentId) external {
@@ -157,6 +186,16 @@ contract RageQuitEscrow {
         if (!success) revert TransferFailed();
 
         emit PaymentExecuted(paymentId, msg.sender, payment.recipient, payment.amount, block.timestamp);
+        emit PaymentDecisionLogged(
+            paymentId,
+            DecisionType.Executed,
+            msg.sender,
+            payment.agent,
+            payment.recipient,
+            payment.amount,
+            payment.intentHash,
+            block.timestamp
+        );
     }
 
     function availableBalance() public view returns (uint256) {

@@ -25,11 +25,15 @@ describe("RageQuitEscrow", function () {
     const { escrow, authorizedAgent, recipient } = await loadFixture(deployFixture);
     const amount = ethers.parseEther("0.5");
     const intentHash = ethers.keccak256(ethers.toUtf8Bytes("invoice-001"));
+    const tx = escrow.connect(authorizedAgent).initiate(recipient.address, amount, intentHash);
 
-    await expect(escrow.connect(authorizedAgent).initiate(recipient.address, amount, intentHash))
+    await expect(tx)
       .to.emit(escrow, "PaymentQueued")
       .withArgs(0, authorizedAgent.address, recipient.address, amount, anyUint(), intentHash);
 
+    await expect(tx)
+      .to.emit(escrow, "PaymentDecisionLogged")
+      .withArgs(0, 0, authorizedAgent.address, authorizedAgent.address, recipient.address, amount, intentHash, anyUint());
     const payment = await escrow.pendingPayments(0);
     expect(payment.agent).to.equal(authorizedAgent.address);
     expect(payment.recipient).to.equal(recipient.address);
@@ -61,7 +65,9 @@ describe("RageQuitEscrow", function () {
 
     await escrow.connect(authorizedAgent).initiate(recipient.address, ethers.parseEther("0.2"), ethers.ZeroHash);
 
-    await expect(escrow.connect(owner).veto(0)).to.emit(escrow, "PaymentVetoed");
+    await expect(escrow.connect(owner).veto(0))
+      .to.emit(escrow, "PaymentDecisionLogged")
+      .withArgs(0, 1, owner.address, authorizedAgent.address, recipient.address, ethers.parseEther("0.2"), ethers.ZeroHash, anyUint());
 
     const payment = await escrow.pendingPayments(0);
     expect(payment.vetoed).to.equal(true);
@@ -84,8 +90,12 @@ describe("RageQuitEscrow", function () {
 
     await escrow.connect(authorizedAgent).initiate(recipient.address, amount, ethers.ZeroHash);
     await time.increase(vetoWindow + 1);
+    const tx = escrow.execute(0);
 
-    await expect(() => escrow.execute(0)).to.changeEtherBalances([escrow, recipient], [-amount, amount]);
+    await expect(tx).to.changeEtherBalances([escrow, recipient], [-amount, amount]);
+    await expect(tx)
+      .to.emit(escrow, "PaymentDecisionLogged")
+      .withArgs(0, 2, anyAddress(), authorizedAgent.address, recipient.address, amount, ethers.ZeroHash, anyUint());
 
     const payment = await escrow.pendingPayments(0);
     expect(payment.executed).to.equal(true);
@@ -104,4 +114,8 @@ describe("RageQuitEscrow", function () {
 
 function anyUint() {
   return (value) => typeof value === "bigint" && value > 0n;
+}
+
+function anyAddress() {
+  return (value) => typeof value === "string" && value.startsWith("0x") && value.length === 42;
 }

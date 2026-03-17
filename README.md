@@ -22,6 +22,14 @@ The repo contains the escrow contract, keeper flow, notification hooks, and dash
 - Dashboard owner-gating: only escrow owner can veto.
 - Sepolia deployment script path and env wiring.
 
+## Day 3 complete
+
+- ERC-8004-style `agent.json` and `agent_log.json` artifacts in the repo root and `frontend/public/`.
+- Structured `PaymentDecisionLogged` onchain event emitted for queue, veto, and execute actions.
+- MetaMask Smart Accounts Kit integration for deriving a delegation-backed authorized smart account at deploy time.
+- Delegation bundle generator for root delegations plus optional redelegation / subdelegation.
+- Dashboard panel showing agent identity, trust metadata, and latest structured audit entries.
+
 ## Setup
 
 1. Install dependencies:
@@ -73,3 +81,70 @@ Deploy command:
 - `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:deploy:sepolia`
 
 Deployment metadata is written to `contracts/deployments/sepolia.json`.
+
+## Day 3: agent identity + delegations
+
+### Generate agent artifacts
+
+1. Ensure the escrow is deployed and `ESCROW_ADDRESS` resolves from env or `contracts/deployments/<network>.json`
+2. Set optional metadata in `contracts/.env`:
+   - `AGENT_BASE_URL`
+   - `AGENT_NAME`
+   - `AGENT_DESCRIPTION`
+   - `AGENT_REGISTRY`
+   - `AGENT_ID`
+3. Generate artifacts:
+   - Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:artifacts:local`
+   - Sepolia: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:artifacts:sepolia`
+
+Generated files:
+
+- `agent.json`
+- `agent_log.json`
+- `frontend/public/agent.json`
+- `frontend/public/agent_log.json`
+- `frontend/public/.well-known/agent-registration.json`
+
+### Deploy with a MetaMask smart account as the authorized agent
+
+Set in `contracts/.env`:
+
+- `SMART_ACCOUNT_OWNER_PRIVATE_KEY`
+- Optional: `SMART_ACCOUNT_DEPLOY_ENVIRONMENT=true` for localhost-only smart account environment deployment
+- Optional: leave `AUTHORIZED_AGENT` empty so the deploy script derives the smart account address automatically
+
+Then deploy:
+
+- Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:deploy:local`
+- Sepolia: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:deploy:sepolia`
+
+The deployment metadata now records:
+
+- `authorizationMode`
+- `smartAccountOwnerAddress`
+- `deploymentBlock`
+
+### Create delegation bundle
+
+Set in `contracts/.env`:
+
+- `SMART_ACCOUNT_OWNER_PRIVATE_KEY`
+- `AGENT_DELEGATE_PRIVATE_KEY`
+- Optional: `AGENT_SUBDELEGATE_PRIVATE_KEY`
+- Optional scope controls:
+  - `DELEGATION_SCOPE_TYPE=function-call`
+  - `DELEGATION_MAX_CALLS=25`
+  - `SUBDELEGATION_MAX_CALLS=5`
+  - `DELEGATION_EXPIRES_AT`
+  - `SUBDELEGATION_EXPIRES_AT`
+
+Generate signed delegation JSON:
+
+- Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:delegations:local`
+- Sepolia: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:delegations:sepolia`
+
+Output:
+
+- `contracts/delegations/<network>.json`
+
+The default delegation scope is a constrained call to `RageQuitEscrow.initiate(address,uint256,bytes32)`. The escrow contract's own `spendLimit` remains the effective per-payment cap, and the signed redelegation chain limits who can invoke it.
