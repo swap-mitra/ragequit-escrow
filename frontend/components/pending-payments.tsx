@@ -184,98 +184,150 @@ export function PendingPayments() {
   const isOwner =
     Boolean(address) && Boolean(ownerAddress) && address!.toLowerCase() === (ownerAddress as string).toLowerCase();
 
+  const paymentViews = rows.map(({ id, result }) => {
+    const payment = result.result as unknown as PaymentTuple;
+    const recipient = payment[1];
+    const amount = payment[2];
+    const unlocksAt = payment[3];
+    const vetoed = payment[5];
+    const executed = payment[6];
+    const remaining = unlocksAt > now ? unlocksAt - now : 0n;
+    const status = vetoed ? "Vetoed" : executed ? "Executed" : "Pending";
+    const chipClass = vetoed
+      ? "status-chip status-vetoed"
+      : executed
+        ? "status-chip status-executed"
+        : "status-chip status-pending";
+
+    return {
+      id,
+      recipient,
+      amount,
+      remaining,
+      status,
+      chipClass,
+      vetoed,
+      executed,
+    };
+  });
+
+  const pendingCount = paymentViews.filter((payment) => payment.status === "Pending").length;
+  const executedCount = paymentViews.filter((payment) => payment.status === "Executed").length;
+  const vetoedCount = paymentViews.filter((payment) => payment.status === "Vetoed").length;
+
   return (
-    <div className="table-wrap">
-      <p className="subtle">Connected wallet must match escrow owner to veto pending payments.</p>
-      {actionMessage ? <p className="subtle">{actionMessage}</p> : null}
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Recipient</th>
-            <th>Amount (wei)</th>
-            <th>Time Left</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(({ id, result }) => {
-            const payment = result.result as unknown as PaymentTuple;
-            const recipient = payment[1];
-            const amount = payment[2];
-            const unlocksAt = payment[3];
-            const vetoed = payment[5];
-            const executed = payment[6];
+    <div className="payments-shell">
+      <div className="metric-strip">
+        <div className="metric-box">
+          <span className="metric-label">Queue</span>
+          <strong>{pendingCount}</strong>
+        </div>
+        <div className="metric-box">
+          <span className="metric-label">Executed</span>
+          <strong>{executedCount}</strong>
+        </div>
+        <div className="metric-box">
+          <span className="metric-label">Vetoed</span>
+          <strong>{vetoedCount}</strong>
+        </div>
+        <div className="metric-box owner-box">
+          <span className="metric-label">Mode</span>
+          <strong>{isOwner ? "Owner live" : "Read only"}</strong>
+        </div>
+      </div>
 
-            const remaining = unlocksAt > now ? unlocksAt - now : 0n;
-            const status = vetoed ? "Vetoed" : executed ? "Executed" : "Pending";
-            const chipClass = vetoed
-              ? "status-chip status-vetoed"
-              : executed
-                ? "status-chip status-executed"
-                : "status-chip status-pending";
+      <div className="info-banner-row">
+        <p className="info-banner">Connected wallet must match escrow owner to veto pending payments.</p>
+        {actionMessage ? <p className="info-banner info-banner-accent">{actionMessage}</p> : null}
+      </div>
 
-            const canVeto = isOwner && !vetoed && !executed && remaining > 0n;
-            const isCurrentVeto = pendingVetoId !== null && pendingVetoId === id;
-            const txInFlight = vetoWritePending || vetoConfirming;
+      <div className="table-wrap brutal-table-wrap">
+        <table className="payments-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Recipient</th>
+              <th>Amount</th>
+              <th>Window</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paymentViews.map((payment) => {
+              const canVeto = isOwner && !payment.vetoed && !payment.executed && payment.remaining > 0n;
+              const isCurrentVeto = pendingVetoId !== null && pendingVetoId === payment.id;
+              const txInFlight = vetoWritePending || vetoConfirming;
 
-            let buttonText = "Veto";
-            if (isCurrentVeto && txInFlight) {
-              buttonText = "Vetoing...";
-            } else if (vetoed) {
-              buttonText = "Vetoed";
-            } else if (executed) {
-              buttonText = "Executed";
-            } else if (remaining === 0n) {
-              buttonText = "Window Closed";
-            } else if (!isOwner) {
-              buttonText = "Owner Only";
-            }
+              let buttonText = "Veto";
+              if (isCurrentVeto && txInFlight) {
+                buttonText = "Vetoing...";
+              } else if (payment.vetoed) {
+                buttonText = "Vetoed";
+              } else if (payment.executed) {
+                buttonText = "Executed";
+              } else if (payment.remaining === 0n) {
+                buttonText = "Window Closed";
+              } else if (!isOwner) {
+                buttonText = "Owner Only";
+              }
 
-            return (
-              <tr key={id.toString()}>
-                <td>{id.toString()}</td>
-                <td>{shortAddress(recipient)}</td>
-                <td>{amount.toString()}</td>
-                <td>{remaining.toString()}s</td>
-                <td>
-                  <span className={chipClass}>{status}</span>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    disabled={!canVeto || txInFlight}
-                    onClick={() => {
-                      if (!address || !chain) {
-                        setActionMessage("Connect a wallet to send veto transaction.");
-                        return;
-                      }
+              return (
+                <tr key={payment.id.toString()}>
+                  <td>
+                    <span className="cell-kicker">#{payment.id.toString()}</span>
+                  </td>
+                  <td>{shortAddress(payment.recipient)}</td>
+                  <td>{compactWei(payment.amount)}</td>
+                  <td>{payment.remaining.toString()}s</td>
+                  <td>
+                    <span className={payment.chipClass}>{payment.status}</span>
+                  </td>
+                  <td>
+                    <button
+                      className="table-action"
+                      type="button"
+                      disabled={!canVeto || txInFlight}
+                      onClick={() => {
+                        if (!address || !chain) {
+                          setActionMessage("Connect a wallet to send veto transaction.");
+                          return;
+                        }
 
-                      setActionMessage(null);
-                      setPendingVetoId(id);
-                      writeContract({
-                        account: address,
-                        chain,
-                        address: contractAddress,
-                        abi: rageQuitEscrowAbi,
-                        functionName: "veto",
-                        args: [id],
-                      });
-                    }}
-                  >
-                    {buttonText}
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                        setActionMessage(null);
+                        setPendingVetoId(payment.id);
+                        writeContract({
+                          account: address,
+                          chain,
+                          address: contractAddress,
+                          abi: rageQuitEscrowAbi,
+                          functionName: "veto",
+                          args: [payment.id],
+                        });
+                      }}
+                    >
+                      {buttonText}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
 function shortAddress(address: `0x${string}`) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+function compactWei(value: bigint) {
+  const raw = value.toString();
+  if (raw.length <= 9) {
+    return `${raw} wei`;
+  }
+
+  return `${raw.slice(0, 4)}...${raw.slice(-4)} wei`;
 }

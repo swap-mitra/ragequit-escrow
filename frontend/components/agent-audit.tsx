@@ -59,7 +59,11 @@ export function AgentAudit() {
 
   const loadArtifacts = useCallback(async () => {
     try {
-      const [cardResponse, logResponse] = await Promise.all([fetch("/agent.json?ts=" + Date.now()), fetch("/agent_log.json?ts=" + Date.now())]);
+      const stamp = Date.now();
+      const [cardResponse, logResponse] = await Promise.all([
+        fetch(`/agent.json?ts=${stamp}`),
+        fetch(`/agent_log.json?ts=${stamp}`),
+      ]);
 
       if (!cardResponse.ok || !logResponse.ok) {
         throw new Error("Agent identity artifacts have not been generated yet.");
@@ -75,39 +79,8 @@ export function AgentAudit() {
   }, []);
 
   useEffect(() => {
-    let active = true;
-
-    async function run() {
-      try {
-        const [cardResponse, logResponse] = await Promise.all([fetch("/agent.json?ts=" + Date.now()), fetch("/agent_log.json?ts=" + Date.now())]);
-
-        if (!cardResponse.ok || !logResponse.ok) {
-          throw new Error("Agent identity artifacts have not been generated yet.");
-        }
-
-        const [card, log] = await Promise.all([cardResponse.json(), logResponse.json()]);
-        if (!active) {
-          return;
-        }
-
-        setAgentCard(card);
-        setAgentLog(log);
-        setError(null);
-      } catch (loadError) {
-        if (!active) {
-          return;
-        }
-
-        setError(loadError instanceof Error ? loadError.message : "Unable to load agent artifacts.");
-      }
-    }
-
-    void run();
-
-    return () => {
-      active = false;
-    };
-  }, []);
+    void loadArtifacts();
+  }, [loadArtifacts]);
 
   async function refreshArtifacts() {
     setRefreshState("refreshing");
@@ -140,11 +113,12 @@ export function AgentAudit() {
     return <p className="subtle">Loading agent identity and audit log...</p>;
   }
 
-  const riskEntries = (agentLog.riskDecisions || []).slice(-5).reverse();
+  const latestDecisionCount = agentLog.decisions.length;
+  const riskEntries = (agentLog.riskDecisions || []).slice(-4).reverse();
 
   return (
-    <div className="audit-grid">
-      <article className="audit-card">
+    <div className="audit-compact-grid">
+      <article className="audit-card audit-identity-card">
         <div className="identity-row">
           <img alt={agentCard.name} className="agent-avatar" src={agentCard.image} />
           <div>
@@ -153,24 +127,26 @@ export function AgentAudit() {
             <p className="subtle">{agentCard.description}</p>
           </div>
         </div>
-        <dl className="meta-list">
-          <div>
-            <dt>Authorized Agent</dt>
-            <dd>{shortAddress(agentLog.authorizedAgent)}</dd>
+
+        <div className="metric-strip compact-strip">
+          <div className="metric-box">
+            <span className="metric-label">Agent</span>
+            <strong>{shortAddress(agentLog.authorizedAgent)}</strong>
           </div>
-          <div>
-            <dt>Escrow Owner</dt>
-            <dd>{shortAddress(agentLog.owner)}</dd>
+          <div className="metric-box">
+            <span className="metric-label">Owner</span>
+            <strong>{shortAddress(agentLog.owner)}</strong>
           </div>
-          <div>
-            <dt>Spend Limit</dt>
-            <dd>{agentLog.spendLimitWei} wei</dd>
+          <div className="metric-box">
+            <span className="metric-label">Spend Limit</span>
+            <strong>{compactWei(agentLog.spendLimitWei)}</strong>
           </div>
-          <div>
-            <dt>Veto Window</dt>
-            <dd>{agentLog.vetoWindowSeconds}s</dd>
+          <div className="metric-box">
+            <span className="metric-label">Veto Window</span>
+            <strong>{agentLog.vetoWindowSeconds}s</strong>
           </div>
-        </dl>
+        </div>
+
         <div className="pill-row">
           {(agentCard.supportedTrust || []).map((trust) => (
             <span key={trust} className="status-chip status-pending">
@@ -178,7 +154,8 @@ export function AgentAudit() {
             </span>
           ))}
         </div>
-        <div className="service-list">
+
+        <div className="service-list brutal-links">
           {agentCard.services.map((service) => (
             <a href={service.endpoint} key={`${service.name}-${service.endpoint}`} rel="noreferrer" target="_blank">
               {service.name}
@@ -188,63 +165,60 @@ export function AgentAudit() {
       </article>
 
       <article className="audit-card">
-        <div className="section-head">
+        <div className="section-head brutal-head">
           <div>
-            <p className="tagline">Structured Decisions</p>
-            <h3>Latest Audit Entries</h3>
+            <p className="tagline">Decision Feed</p>
+            <h3>Onchain</h3>
           </div>
-          <div className="audit-actions">
-            <p className="subtle">Updated {new Date(agentLog.generatedAt).toLocaleString()}</p>
-            <button onClick={refreshArtifacts} disabled={refreshState === "refreshing"} type="button">
-              {refreshState === "refreshing" ? "Refreshing..." : "Refresh Audit Artifacts"}
-            </button>
-          </div>
+          <span className="metric-pill">{latestDecisionCount} entries</span>
         </div>
 
-        {refreshMessage ? <p className="subtle">{refreshMessage}</p> : null}
-
         {agentLog.decisions.length === 0 ? (
-          <p className="subtle">No onchain decisions recorded yet. Generate artifacts after queueing a payment.</p>
+          <p className="subtle">No onchain decisions recorded yet.</p>
         ) : (
-          <div className="audit-log-list">
-            {agentLog.decisions.slice(-5).reverse().map((entry) => (
-              <div key={`${entry.transactionHash}-${entry.paymentId}`} className="audit-log-item">
-                <div>
-                  <strong>#{entry.paymentId}</strong> {entry.decisionLabel}
+          <div className="audit-log-list compact-log-list">
+            {agentLog.decisions.slice(-4).reverse().map((entry) => (
+              <div key={`${entry.transactionHash}-${entry.paymentId}`} className="audit-log-item brutal-item">
+                <div className="log-topline">
+                  <strong>#{entry.paymentId}</strong>
+                  <span className="status-chip status-executed">{entry.decisionLabel}</span>
                 </div>
-                <div className="subtle">
-                  {shortAddress(entry.actor)} -&gt; {shortAddress(entry.recipient)}
-                </div>
-                <div className="subtle">{entry.amountWei} wei</div>
+                <div className="subtle">{shortAddress(entry.actor)} -&gt; {shortAddress(entry.recipient)}</div>
+                <div className="subtle">{compactWei(entry.amountWei)}</div>
               </div>
             ))}
           </div>
         )}
+      </article>
 
-        <div className="section-head" style={{ marginTop: 24 }}>
+      <article className="audit-card audit-risk-card">
+        <div className="section-head brutal-head">
           <div>
             <p className="tagline">Private Risk Gate</p>
-            <h3>Latest Risk Verdicts</h3>
+            <h3>Latest Verdicts</h3>
           </div>
+          <button onClick={refreshArtifacts} disabled={refreshState === "refreshing"} type="button">
+            {refreshState === "refreshing" ? "Refreshing..." : "Refresh Artifacts"}
+          </button>
         </div>
 
+        {refreshMessage ? <p className="subtle">{refreshMessage}</p> : null}
+
         {riskEntries.length === 0 ? (
-          <p className="subtle">No risk verdicts recorded yet. Run the Day 5 agent flow to populate this feed.</p>
+          <p className="subtle">No risk verdicts recorded yet.</p>
         ) : (
-          <div className="audit-log-list">
+          <div className="audit-log-list compact-log-list">
             {riskEntries.map((entry) => (
-              <div key={`${entry.createdAt}-${entry.status}-${entry.recipient}`} className="audit-log-item">
-                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <div key={`${entry.createdAt}-${entry.status}-${entry.recipient}`} className="audit-log-item brutal-item">
+                <div className="log-topline">
                   <span className={riskChipClass(entry.verdict)}>{formatVerdict(entry.verdict)}</span>
-                  <strong>{entry.riskScore}</strong>
-                  <span className="subtle">/ {entry.riskThreshold}</span>
-                  <span className="subtle">via {entry.riskProvider}</span>
+                  <strong>
+                    {entry.riskScore}/{entry.riskThreshold}
+                  </strong>
                 </div>
                 <div className="subtle">{entry.task}</div>
-                <div className="subtle">
-                  {shortAddress(agentLog.authorizedAgent)} -&gt; {shortAddress(entry.recipient)}
-                </div>
-                <div className="subtle">{entry.amountWei} wei</div>
+                <div className="subtle">{shortAddress(agentLog.authorizedAgent)} -&gt; {shortAddress(entry.recipient)}</div>
+                <div className="subtle">{compactWei(entry.amountWei)}</div>
                 <div className="subtle">{entry.reasons.join("; ")}</div>
               </div>
             ))}
@@ -269,4 +243,12 @@ function shortAddress(address: string) {
   }
 
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+function compactWei(raw: string) {
+  if (raw.length <= 9) {
+    return `${raw} wei`;
+  }
+
+  return `${raw.slice(0, 4)}...${raw.slice(-4)} wei`;
 }

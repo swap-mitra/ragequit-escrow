@@ -15,7 +15,8 @@ export function ConnectWallet() {
 
   if (!mounted) {
     return (
-      <div className="wallet-row">
+      <div className="wallet-card">
+        <p className="wallet-label">Wallet</p>
         <button type="button" disabled>
           Connect Wallet
         </button>
@@ -24,27 +25,35 @@ export function ConnectWallet() {
   }
 
   return (
-    <div className="wallet-row">
+    <div className="wallet-card">
+      <p className="wallet-label">Operator Wallet</p>
       {isConnected ? (
-        <>
-          <span>Connected: {shortAddress(address || "")}</span>
+        <div className="wallet-stack">
+          <div className="wallet-badge-row">
+            <span className="metric-pill">Connected</span>
+            <span className="wallet-address">{shortAddress(address || "")}</span>
+          </div>
           <button onClick={() => disconnect()} type="button">
             Disconnect
           </button>
-        </>
+        </div>
       ) : (
-        connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            disabled={isPending}
-            type="button"
-          >
-            {isPending ? "Connecting..." : `Connect ${connector.name}`}
-          </button>
-        ))
+        <div className="wallet-stack">
+          <div className="wallet-button-grid">
+            {connectors.map((connector) => (
+              <button
+                key={connector.uid}
+                onClick={() => connect({ connector })}
+                disabled={isPending}
+                type="button"
+              >
+                {isPending ? "Connecting..." : connector.name}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
-      {error ? <span className="subtle">{error.message}</span> : null}
+      {error ? <span className="subtle wallet-error">{error.message}</span> : null}
     </div>
   );
 }
