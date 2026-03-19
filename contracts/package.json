@@ -12,6 +12,8 @@
     "artifacts:sepolia": "hardhat run scripts/generateAgentArtifacts.js --network sepolia",
     "delegations:local": "hardhat run scripts/createDelegationBundle.js --network localhost",
     "delegations:sepolia": "hardhat run scripts/createDelegationBundle.js --network sepolia",
+    "run-agent:local": "hardhat run scripts/agentRunner.js --network localhost",
+    "run-agent:sepolia": "hardhat run scripts/agentRunner.js --network sepolia",
     "keeper": "hardhat run scripts/keeper.js --network localhost",
     "watch:telegram:local": "hardhat run scripts/telegramWatcher.js --network localhost",
     "watch:telegram:sepolia": "hardhat run scripts/telegramWatcher.js --network sepolia"

@@ -9,6 +9,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { rageQuitEscrowAbi } from "../lib/contracts/rageQuitEscrow";
+import { hardhatLocal } from "../lib/wagmi";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 
@@ -43,20 +44,30 @@ export function PendingPayments() {
     return () => clearInterval(timer);
   }, []);
 
-  const { data: ownerAddress } = useReadContract({
+  const {
+    data: ownerAddress,
+    error: ownerReadError,
+  } = useReadContract({
     address: contractAddress,
     abi: rageQuitEscrowAbi,
     functionName: "owner",
+    chainId: hardhatLocal.id,
     query: {
       enabled: Boolean(configuredAddress),
       refetchInterval: 5000,
     },
   });
 
-  const { data: nextPaymentId, isLoading: nextPaymentLoading, refetch: refetchNextPaymentId } = useReadContract({
+  const {
+    data: nextPaymentId,
+    isLoading: nextPaymentLoading,
+    error: nextPaymentError,
+    refetch: refetchNextPaymentId,
+  } = useReadContract({
     address: contractAddress,
     abi: rageQuitEscrowAbi,
     functionName: "nextPaymentId",
+    chainId: hardhatLocal.id,
     query: {
       enabled: Boolean(configuredAddress),
       refetchInterval: 5000,
@@ -80,12 +91,14 @@ export function PendingPayments() {
   const {
     data: paymentResults,
     isLoading: paymentLoading,
+    error: paymentReadError,
     refetch: refetchPayments,
   } = useReadContracts({
     contracts: paymentIds.map((id) => ({
       address: contractAddress,
       abi: rageQuitEscrowAbi,
       functionName: "pendingPayments",
+      chainId: hardhatLocal.id,
       args: [id],
     })),
     query: {
@@ -107,6 +120,7 @@ export function PendingPayments() {
     error: vetoConfirmError,
   } = useWaitForTransactionReceipt({
     hash: vetoHash,
+    chainId: hardhatLocal.id,
   });
 
   useEffect(() => {
@@ -140,6 +154,11 @@ export function PendingPayments() {
 
   if (!configuredAddress) {
     return <p className="subtle">Set `NEXT_PUBLIC_ESCROW_ADDRESS` to load pending payments.</p>;
+  }
+
+  if (ownerReadError || nextPaymentError || paymentReadError) {
+    const errorMessage = ownerReadError?.message || nextPaymentError?.message || paymentReadError?.message;
+    return <p className="subtle">Contract read failed: {errorMessage}</p>;
   }
 
   if (nextPaymentLoading || paymentLoading) {

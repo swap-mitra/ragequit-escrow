@@ -2,7 +2,7 @@
   "type": "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
   "name": "RageQuit Escrow",
   "description": "Human-vetoed autonomous payment agent that queues payouts onchain and exposes a revocable execution window.",
-  "image": "/agent-avatar.svg",
+  "image": "http://localhost:3000/agent-avatar.svg",
   "services": [
     {
       "name": "web",
@@ -31,4 +31,3 @@
     "validation"
   ]
 }
-

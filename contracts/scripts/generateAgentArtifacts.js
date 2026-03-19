@@ -16,6 +16,22 @@ function resolveDeployment(networkName) {
   }
 }
 
+function resolveRuns(networkName) {
+  const runsPath = path.join(__dirname, "..", "runs", `${networkName}.json`);
+  if (!fs.existsSync(runsPath)) {
+    return { runs: [] };
+  }
+
+  try {
+    const parsed = JSON.parse(fs.readFileSync(runsPath, "utf8"));
+    return {
+      runs: Array.isArray(parsed.runs) ? parsed.runs : [],
+    };
+  } catch {
+    return { runs: [] };
+  }
+}
+
 function mkdirFor(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
@@ -91,6 +107,25 @@ function buildRegistrations() {
   return [];
 }
 
+function buildRiskDecisions(runs) {
+  return runs
+    .filter((run) => run && run.riskAssessment)
+    .map((run) => ({
+      createdAt: run.createdAt,
+      status: run.status || "unknown",
+      task: run.task,
+      recipient: run.recipient,
+      amountWei: run.amountWei,
+      paymentId: run.paymentId,
+      transactionHash: run.transactionHash,
+      riskProvider: run.riskAssessment.provider,
+      verdict: run.riskAssessment.verdict,
+      riskScore: String(run.riskAssessment.riskScore ?? ""),
+      riskThreshold: String(run.riskAssessment.riskThreshold ?? ""),
+      reasons: Array.isArray(run.riskAssessment.reasons) ? run.riskAssessment.reasons : [],
+    }));
+}
+
 async function main() {
   const { ethers, network } = hre;
   const deployment = resolveDeployment(network.name);
@@ -112,6 +147,7 @@ async function main() {
   const latestBlock = await ethers.provider.getBlockNumber();
   const fromBlock = Number(process.env.AGENT_LOG_FROM_BLOCK || deployment?.deploymentBlock || 0);
   const decisionEvents = await contract.queryFilter(contract.filters.PaymentDecisionLogged(), fromBlock, latestBlock);
+  const runLog = resolveRuns(network.name);
 
   const [owner, authorizedAgent, vetoWindow, spendLimit] = await Promise.all([
     contract.owner(),
@@ -167,6 +203,7 @@ async function main() {
       transactionHash: event.transactionHash,
       blockNumber: event.blockNumber,
     })),
+    riskDecisions: buildRiskDecisions(runLog.runs),
   };
 
   const repoRoot = path.join(__dirname, "..", "..");

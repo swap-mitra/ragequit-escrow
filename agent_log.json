@@ -1,6 +1,6 @@
 {
   "type": "http://localhost:3000/schemas/agent-log-v1",
-  "generatedAt": "2026-03-17T00:00:00.000Z",
+  "generatedAt": "2026-03-19T09:04:25.002Z",
   "network": "localhost",
   "chainId": 31337,
   "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
@@ -8,5 +8,92 @@
   "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
   "vetoWindowSeconds": "60",
   "spendLimitWei": "1000000000000000000",
-  "decisions": []
+  "decisions": [
+    {
+      "paymentId": "0",
+      "decisionType": 0,
+      "decisionLabel": "queued",
+      "actor": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "intentHash": "0xb390e947afa37d649f1e820ebbf667dd5ca7da47766d00054b905c8ed2499190",
+      "timestamp": "1773909666",
+      "transactionHash": "0xf2974baa5d5dcdb2ce5ebf5a40c2d588b5cc636d142b2a3bbf027ffd15e5b971",
+      "blockNumber": 3
+    },
+    {
+      "paymentId": "0",
+      "decisionType": 2,
+      "decisionLabel": "executed",
+      "actor": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "intentHash": "0xb390e947afa37d649f1e820ebbf667dd5ca7da47766d00054b905c8ed2499190",
+      "timestamp": "1773909729",
+      "transactionHash": "0xda53509ba9a670640472a342e645aafb7898daa22b8fce58aed1e0342a0e6b81",
+      "blockNumber": 4
+    },
+    {
+      "paymentId": "1",
+      "decisionType": 0,
+      "decisionLabel": "queued",
+      "actor": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "intentHash": "0x82ccca746129829cbd7a044a244b0d4f3b96177a96f345257b0a2568f427d9f0",
+      "timestamp": "1773910469",
+      "transactionHash": "0x72836776362ddc8d679d5a3c42a96751bcfb96ea22d58191c4906b9068fa1b53",
+      "blockNumber": 5
+    },
+    {
+      "paymentId": "1",
+      "decisionType": 2,
+      "decisionLabel": "executed",
+      "actor": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "intentHash": "0x82ccca746129829cbd7a044a244b0d4f3b96177a96f345257b0a2568f427d9f0",
+      "timestamp": "1773910533",
+      "transactionHash": "0xbdf54ebdd0c7192701e59e7606d44d8d7eb55a1da871c97f762c2e9bdc29e784",
+      "blockNumber": 6
+    }
+  ],
+  "riskDecisions": [
+    {
+      "createdAt": "2026-03-19T08:54:29.425Z",
+      "status": "queued_onchain",
+      "task": "Pay test vendor for local smoke run",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "paymentId": "1",
+      "transactionHash": "0x72836776362ddc8d679d5a3c42a96751bcfb96ea22d58191c4906b9068fa1b53",
+      "riskProvider": "local-risk",
+      "verdict": "queue_payment",
+      "riskScore": "10",
+      "riskThreshold": "70",
+      "reasons": [
+        "no elevated local risk signals triggered"
+      ]
+    },
+    {
+      "createdAt": "2026-03-19T08:54:52.591Z",
+      "status": "blocked_by_risk",
+      "task": "Pay test vendor for local smoke run",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "paymentId": null,
+      "transactionHash": null,
+      "riskProvider": "local-risk",
+      "verdict": "block_payment",
+      "riskScore": "100",
+      "riskThreshold": "70",
+      "reasons": [
+        "recipient is on local blocked-recipient list"
+      ]
+    }
+  ]
 }

@@ -1,0 +1,36 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.9.3
+2 info using node@v22.20.0
+3 silly config load:file:C:\Program Files\nodejs\node_modules\npm\npmrc
+4 silly config load:file:C:\projects\ragequit-escrow\.npmrc
+5 silly config load:file:C:\Users\swpnl\.npmrc
+6 silly config load:file:C:\projects\ragequit-escrow\.hardhat-appdata\npm\etc\npmrc
+7 verbose title npm run deploy:local
+8 verbose argv "--workspace" "contracts" "run" "deploy:local"
+9 verbose logfile logs-max:10 dir:C:\projects\ragequit-escrow\.hardhat-localappdata\npm-cache\_logs\2026-03-19T08_54_03_731Z-
+10 verbose logfile C:\projects\ragequit-escrow\.hardhat-localappdata\npm-cache\_logs\2026-03-19T08_54_03_731Z-debug-0.log
+11 silly logfile done cleaning log files
+12 verbose stack Error: command failed
+12 verbose stack     at promiseSpawn (C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:22:22)
+12 verbose stack     at spawnWithShell (C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:124:10)
+12 verbose stack     at promiseSpawn (C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\promise-spawn\lib\index.js:12:12)
+12 verbose stack     at runScriptPkg (C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\run-script\lib\run-script-pkg.js:79:13)
+12 verbose stack     at runScript (C:\Program Files\nodejs\node_modules\npm\node_modules\@npmcli\run-script\lib\run-script.js:9:12)
+12 verbose stack     at #run (C:\Program Files\nodejs\node_modules\npm\lib\commands\run-script.js:131:13)
+12 verbose stack     at RunScript.execWorkspaces (C:\Program Files\nodejs\node_modules\npm\lib\commands\run-script.js:63:24)
+12 verbose stack     at async Npm.exec (C:\Program Files\nodejs\node_modules\npm\lib\npm.js:207:9)
+12 verbose stack     at async module.exports (C:\Program Files\nodejs\node_modules\npm\lib\cli\entry.js:74:5)
+13 verbose pkgid ragequit-escrow-contracts@0.1.0
+14 error Lifecycle script `deploy:local` failed with error:
+15 error code 1
+16 error path C:\projects\ragequit-escrow\contracts
+17 error workspace ragequit-escrow-contracts@0.1.0
+18 error location C:\projects\ragequit-escrow\contracts
+19 error command failed
+20 error command C:\WINDOWS\system32\cmd.exe /d /s /c hardhat run scripts/deploy.js --network localhost
+21 verbose cwd C:\projects\ragequit-escrow
+22 verbose os Windows_NT 10.0.26200
+23 verbose node v22.20.0
+24 verbose npm  v10.9.3
+25 verbose exit 1
+26 verbose code 1

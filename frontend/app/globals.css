@@ -102,6 +102,18 @@ button[disabled] {
   gap: 0.75rem;
 }
 
+.audit-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.audit-actions .subtle {
+  margin: 0;
+  text-align: right;
+}
+
 .agent-avatar {
   width: 56px;
   height: 56px;
@@ -207,6 +219,14 @@ td {
   .meta-list {
     grid-template-columns: 1fr;
     display: grid;
+  }
+
+  .audit-actions {
+    align-items: stretch;
+  }
+
+  .audit-actions .subtle {
+    text-align: left;
   }
 
   th,

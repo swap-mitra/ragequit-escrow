@@ -49,7 +49,11 @@ contract RageQuitEscrow {
         uint256 unlocksAt,
         bytes32 intentHash
     );
-    event PaymentVetoed(uint256 indexed paymentId, address indexed owner, uint256 timestamp);
+    event PaymentVetoed(
+        uint256 indexed paymentId,
+        address indexed owner,
+        uint256 timestamp
+    );
     event PaymentExecuted(
         uint256 indexed paymentId,
         address indexed executor,
@@ -84,8 +88,14 @@ contract RageQuitEscrow {
         _;
     }
 
-    constructor(address _owner, address _authorizedAgent, uint256 _vetoWindow, uint256 _spendLimit) {
-        if (_owner == address(0) || _authorizedAgent == address(0)) revert InvalidAddress();
+    constructor(
+        address _owner,
+        address _authorizedAgent,
+        uint256 _vetoWindow,
+        uint256 _spendLimit
+    ) {
+        if (_owner == address(0) || _authorizedAgent == address(0))
+            revert InvalidAddress();
         if (_spendLimit == 0) revert InvalidAmount();
 
         owner = _owner;
@@ -117,11 +127,11 @@ contract RageQuitEscrow {
         emit ConfigUpdated(owner, authorizedAgent, vetoWindow, spendLimit);
     }
 
-    function initiate(address recipient, uint256 amount, bytes32 intentHash)
-        external
-        onlyAuthorizedAgent
-        returns (uint256 paymentId)
-    {
+    function initiate(
+        address recipient,
+        uint256 amount,
+        bytes32 intentHash
+    ) external onlyAuthorizedAgent returns (uint256 paymentId) {
         if (recipient == address(0)) revert InvalidRecipient();
         if (amount == 0) revert InvalidAmount();
         if (amount > spendLimit) revert SpendLimitExceeded();
@@ -143,9 +153,23 @@ contract RageQuitEscrow {
 
         lockedBalance += amount;
 
-        emit PaymentQueued(paymentId, msg.sender, recipient, amount, unlocksAt, intentHash);
+        emit PaymentQueued(
+            paymentId,
+            msg.sender,
+            recipient,
+            amount,
+            unlocksAt,
+            intentHash
+        );
         emit PaymentDecisionLogged(
-            paymentId, DecisionType.Queued, msg.sender, msg.sender, recipient, amount, intentHash, block.timestamp
+            paymentId,
+            DecisionType.Queued,
+            msg.sender,
+            msg.sender,
+            recipient,
+            amount,
+            intentHash,
+            block.timestamp
         );
     }
 
@@ -182,10 +206,16 @@ contract RageQuitEscrow {
         payment.executed = true;
         lockedBalance -= payment.amount;
 
-        (bool success,) = payment.recipient.call{value: payment.amount}("");
+        (bool success, ) = payment.recipient.call{value: payment.amount}("");
         if (!success) revert TransferFailed();
 
-        emit PaymentExecuted(paymentId, msg.sender, payment.recipient, payment.amount, block.timestamp);
+        emit PaymentExecuted(
+            paymentId,
+            msg.sender,
+            payment.recipient,
+            payment.amount,
+            block.timestamp
+        );
         emit PaymentDecisionLogged(
             paymentId,
             DecisionType.Executed,
@@ -205,10 +235,15 @@ contract RageQuitEscrow {
     function canExecute(uint256 paymentId) external view returns (bool) {
         if (paymentId >= nextPaymentId) return false;
         PendingPayment memory payment = pendingPayments[paymentId];
-        return !payment.vetoed && !payment.executed && block.timestamp >= payment.unlocksAt;
+        return
+            !payment.vetoed &&
+            !payment.executed &&
+            block.timestamp >= payment.unlocksAt;
     }
 
-    function _getPayment(uint256 paymentId) internal view returns (PendingPayment storage payment) {
+    function _getPayment(
+        uint256 paymentId
+    ) internal view returns (PendingPayment storage payment) {
         if (paymentId >= nextPaymentId) revert PaymentNotFound();
         payment = pendingPayments[paymentId];
     }

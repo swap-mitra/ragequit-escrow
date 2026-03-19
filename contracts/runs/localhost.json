@@ -1,0 +1,236 @@
+{
+  "runs": [
+    {
+      "createdAt": "2026-03-19T08:33:03.944Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay test vendor for local smoke run",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "intentHash": "0xe87b6d2b0804fedf5225332315f392fc10ac93e057b7e0fe465b95e35cad2cb0",
+      "intent": {
+        "version": 1,
+        "task": "Pay test vendor for local smoke run",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+        "createdAt": "2026-03-19T08:33:03.823Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "paymentId": "0",
+      "transactionHash": "0xf6883a4ae822d75bc3555a735316ffc40fd8a58651b6c4671f3ff11330fa587d",
+      "blockNumber": 11
+    },
+    {
+      "createdAt": "2026-03-19T08:38:59.985Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay test vendor for local smoke run",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "intentHash": "0x9cb660a0e38f720a7f523435c89954e6a9717308882f7e728d0d0e163462879a",
+      "intent": {
+        "version": 1,
+        "task": "Pay test vendor for local smoke run",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+        "createdAt": "2026-03-19T08:38:59.932Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "paymentId": "1",
+      "transactionHash": "0x4dae9c9fae7b8ef7cd9556919ceea052cb69709388a4b4daaf86c2d62f733b62",
+      "blockNumber": 12
+    },
+    {
+      "createdAt": "2026-03-19T08:41:06.292Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay test vendor for local smoke run",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "intentHash": "0xb390e947afa37d649f1e820ebbf667dd5ca7da47766d00054b905c8ed2499190",
+      "intent": {
+        "version": 1,
+        "task": "Pay test vendor for local smoke run",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-19T08:41:06.229Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "paymentId": "0",
+      "transactionHash": "0xf2974baa5d5dcdb2ce5ebf5a40c2d588b5cc636d142b2a3bbf027ffd15e5b971",
+      "blockNumber": 3
+    },
+    {
+      "createdAt": "2026-03-19T08:54:29.425Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay test vendor for local smoke run",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "intentHash": "0x82ccca746129829cbd7a044a244b0d4f3b96177a96f345257b0a2568f427d9f0",
+      "intent": {
+        "version": 1,
+        "task": "Pay test vendor for local smoke run",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-19T08:54:29.425Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "1",
+      "transactionHash": "0x72836776362ddc8d679d5a3c42a96751bcfb96ea22d58191c4906b9068fa1b53",
+      "blockNumber": 5
+    },
+    {
+      "createdAt": "2026-03-19T08:54:52.591Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay test vendor for local smoke run",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay test vendor for local smoke run",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "block_payment",
+        "riskScore": 100,
+        "riskThreshold": 70,
+        "reasons": [
+          "recipient is on local blocked-recipient list"
+        ]
+      },
+      "status": "blocked_by_risk",
+      "intentHash": null,
+      "intent": null,
+      "paymentId": null,
+      "transactionHash": null,
+      "blockNumber": null
+    }
+  ]
+}

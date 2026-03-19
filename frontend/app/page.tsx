@@ -6,10 +6,11 @@ export default function HomePage() {
   return (
     <main className="page-wrap">
       <section className="hero-card">
-        <p className="tagline">Rage Quit Escrow</p>
+        <p className="tagline">RageQuit Escrow</p>
         <h1>Human-vetoed autonomous payments</h1>
         <p>
-          Day 2 build: wallet connection, pending-payment feed, countdown timers, and owner-only one-click veto.
+          Day 5 build: agent-runner flow with a private pre-queue risk gate, so suspicious payments can be blocked
+          before they ever hit escrow.
         </p>
         <ConnectWallet />
       </section>

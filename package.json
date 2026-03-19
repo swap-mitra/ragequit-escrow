@@ -16,6 +16,8 @@
     "contracts:artifacts:sepolia": "npm --workspace contracts run artifacts:sepolia",
     "contracts:delegations:local": "npm --workspace contracts run delegations:local",
     "contracts:delegations:sepolia": "npm --workspace contracts run delegations:sepolia",
+    "contracts:run-agent:local": "npm --workspace contracts run run-agent:local",
+    "contracts:run-agent:sepolia": "npm --workspace contracts run run-agent:sepolia",
     "contracts:keeper": "npm --workspace contracts run keeper",
     "contracts:watch:telegram:local": "npm --workspace contracts run watch:telegram:local",
     "contracts:watch:telegram:sepolia": "npm --workspace contracts run watch:telegram:sepolia",
