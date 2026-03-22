@@ -21,16 +21,22 @@ function resolveRpcUrl(networkName) {
     return process.env.SEPOLIA_RPC_URL;
   }
 
+  if (networkName === "alfajores" && process.env.CELO_ALFAJORES_RPC_URL) {
+    return process.env.CELO_ALFAJORES_RPC_URL;
+  }
+
   throw new Error(`Missing RPC URL for network ${networkName}. Set RPC_URL or the network-specific variable.`);
 }
 
 function buildChain(chainId, networkName, rpcUrl) {
+  const isCelo = networkName === "alfajores" || networkName === "celo";
+
   return {
     id: chainId,
     name: networkName,
     nativeCurrency: {
-      name: "Ether",
-      symbol: "ETH",
+      name: isCelo ? "Celo" : "Ether",
+      symbol: isCelo ? "CELO" : "ETH",
       decimals: 18,
     },
     rpcUrls: {

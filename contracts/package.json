@@ -1,30 +1,36 @@
 {
-  "name": "ragequit-escrow-contracts",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "compile": "hardhat compile",
-    "test": "hardhat test",
-    "node": "hardhat node",
-    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
-    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
-    "artifacts:local": "hardhat run scripts/generateAgentArtifacts.js --network localhost",
-    "artifacts:sepolia": "hardhat run scripts/generateAgentArtifacts.js --network sepolia",
-    "delegations:local": "hardhat run scripts/createDelegationBundle.js --network localhost",
-    "delegations:sepolia": "hardhat run scripts/createDelegationBundle.js --network sepolia",
-    "run-agent:local": "hardhat run scripts/agentRunner.js --network localhost",
-    "run-agent:sepolia": "hardhat run scripts/agentRunner.js --network sepolia",
-    "keeper": "hardhat run scripts/keeper.js --network localhost",
-    "watch:telegram:local": "hardhat run scripts/telegramWatcher.js --network localhost",
-    "watch:telegram:sepolia": "hardhat run scripts/telegramWatcher.js --network sepolia"
-  },
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "dotenv": "^16.4.7",
-    "hardhat": "^2.22.18"
-  },
-  "dependencies": {
-    "@metamask/smart-accounts-kit": "^0.4.0-beta.1",
-    "viem": "^2.47.4"
-  }
+    "name":  "ragequit-escrow-contracts",
+    "version":  "0.1.0",
+    "private":  true,
+    "scripts":  {
+                    "compile":  "hardhat compile",
+                    "test":  "hardhat test",
+                    "node":  "hardhat node",
+                    "deploy:local":  "hardhat run scripts/deploy.js --network localhost",
+                    "deploy:sepolia":  "hardhat run scripts/deploy.js --network sepolia",
+                    "artifacts:local":  "hardhat run scripts/generateAgentArtifacts.js --network localhost",
+                    "artifacts:sepolia":  "hardhat run scripts/generateAgentArtifacts.js --network sepolia",
+                    "delegations:local":  "hardhat run scripts/createDelegationBundle.js --network localhost",
+                    "delegations:sepolia":  "hardhat run scripts/createDelegationBundle.js --network sepolia",
+                    "run-agent:local":  "hardhat run scripts/agentRunner.js --network localhost",
+                    "run-agent:sepolia":  "hardhat run scripts/agentRunner.js --network sepolia",
+                    "keeper":  "hardhat run scripts/keeper.js --network localhost",
+                    "watch:telegram:local":  "hardhat run scripts/telegramWatcher.js --network localhost",
+                    "watch:telegram:sepolia":  "hardhat run scripts/telegramWatcher.js --network sepolia",
+                    "deploy:alfajores":  "hardhat run scripts/deploy.js --network alfajores",
+                    "artifacts:alfajores":  "hardhat run scripts/generateAgentArtifacts.js --network alfajores",
+                    "delegations:alfajores":  "hardhat run scripts/createDelegationBundle.js --network alfajores",
+                    "run-agent:alfajores":  "hardhat run scripts/agentRunner.js --network alfajores",
+                    "keeper:alfajores":  "hardhat run scripts/keeper.js --network alfajores",
+                    "watch:telegram:alfajores":  "hardhat run scripts/telegramWatcher.js --network alfajores"
+                },
+    "devDependencies":  {
+                            "@nomicfoundation/hardhat-toolbox":  "^5.0.0",
+                            "dotenv":  "^16.4.7",
+                            "hardhat":  "^2.22.18"
+                        },
+    "dependencies":  {
+                         "@metamask/smart-accounts-kit":  "^0.4.0-beta.1",
+                         "viem":  "^2.47.4"
+                     }
 }

@@ -1,321 +1,361 @@
 # RageQuit Escrow
 
-RageQuit Escrow is a smart-contract payment control layer for AI agents. An agent can queue a payment, the human operator gets a bounded veto window, and the payment executes only if the human does nothing. The goal is to make autonomous payments revocable at the edge without relying on offchain policy alone.
+RageQuit Escrow is a smart-contract payment control layer for AI agents. Instead of letting an agent send irreversible payments directly, the agent queues a payout into escrow, the human operator gets a veto window, and the payment executes only if the human does nothing.
 
-The repo contains the escrow contract, keeper flow, notification hooks, agent runner, and dashboard needed to monitor pending payments and stop suspicious ones before execution.
+The core idea is simple: safer agentic payments need revocable execution, not just better prompting.
 
-## Monorepo layout
+## Problem
 
-- `contracts/` Hardhat smart-contract workspace
-- `frontend/` Next.js dashboard with `wagmi` + `viem`
+Autonomous agents can make correct payment decisions most of the time and still be dangerous at the margin.
 
-## Day 1 complete
+Common failure modes:
 
-- `RageQuitEscrow.sol` with `initiate`, `veto`, `execute`, `PendingPayment`.
-- Unit tests for queueing, veto flow, timeout execution, auth/spend-limit checks.
-- Deploy script + keeper script.
+- the agent pays the wrong recipient
+- the payment amount is valid in format but wrong in context
+- a malicious or suspicious instruction pressures the agent into urgency
+- the user notices too late, after funds are already gone
 
-## Day 2 complete
+RageQuit Escrow addresses that by turning every payout into a pending claim with an explicit human override period enforced onchain.
 
-- Telegram event watcher for `PaymentQueued` notifications.
-- Dashboard veto button wired to `veto(paymentId)` transaction.
-- Dashboard owner-gating: only escrow owner can veto.
-- Sepolia deployment script path and env wiring.
+## Solution
 
-## Day 3 complete
+The system splits payment execution into two phases:
 
-- ERC-8004-style `agent.json` and `agent_log.json` artifacts in the repo root and `frontend/public/`.
-- Structured `PaymentDecisionLogged` onchain event emitted for queue, veto, and execute actions.
-- MetaMask Smart Accounts Kit integration for deriving a delegation-backed authorized smart account at deploy time.
-- Delegation bundle generator for root delegations plus optional redelegation / subdelegation.
-- Dashboard panel showing agent identity, trust metadata, and latest structured audit entries.
+1. The agent prepares and queues a payment through `RageQuitEscrow`.
+2. The human can veto during the veto window, or let the payment execute after timeout.
 
-## Day 4 complete
+Supporting layers around that core:
 
-- Agent runner script that converts a task into a structured payment intent.
-- Deterministic local reasoning with optional OpenAI-backed reasoning.
-- Intent JSON hashed before queueing and passed to `initiate()`.
-- Local run log persisted under `contracts/runs/<network>.json` for demo and audit.
-- Optional post-run refresh of `agent_log.json` artifacts.
+- private risk scoring before queueing
+- Telegram notifications for queued payments
+- a dashboard for visibility and veto control
+- structured agent artifacts and audit logs
+- token-settlement and swap-backed funding support
+- optional Celo, ENS, Self, and payment-rail metadata
 
-## Day 5 complete
+## Architecture
 
-- Private risk check inserted before `RageQuitEscrow.initiate()`.
-- Deterministic local risk scoring with optional Venice-backed risk assessment.
-- Risk-blocked payments stay offchain and are recorded only in local run logs.
-- Allowed payments still queue through escrow with the same hashed intent flow.
-- Frontend audit panel now shows the latest private risk verdicts from the run log artifacts.
-- Frontend audit panel now has a manual refresh button that regenerates artifacts through a local Next.js route.
+### Core contract
+
+`contracts/contracts/RageQuitEscrow.sol`
+
+- authorized agent can queue a payment
+- owner can veto during the active window
+- anyone or a keeper can execute after timeout
+- supports native settlement and ERC-20 settlement
+- stores `intentHash` and `fundingReference` for auditability
+- emits structured decision events for queue, veto, and execute
+
+### Agent loop
+
+`contracts/scripts/agentRunner.js`
+
+- turns a task into a payment intent
+- runs deterministic local reasoning or OpenAI-backed reasoning
+- runs local or Venice-backed private risk checks
+- supports direct token funding or swap-backed token funding
+- writes run logs to `contracts/runs/<network>.json`
+
+### Notifications
+
+`contracts/scripts/telegramWatcher.js`
+
+- watches `PaymentQueued` events
+- sends operator alerts to Telegram
+- now includes payment-rail and identity labeling metadata when configured
+
+Telegram is the operator notification channel used by the project. There is no separate mobile notification implementation in this repo.
+
+### Frontend
+
+`frontend/`
+
+- Next.js operator console
+- wallet connect and owner-gated veto action
+- pending payment feed
+- agent identity and audit panel
+- supports `localhost`, `sepolia`, and `alfajores`
+
+### Artifacts and audit
+
+`contracts/scripts/generateAgentArtifacts.js`
+
+- generates `agent.json`
+- generates `agent_log.json`
+- includes rail metadata, ENS labels, and Self verification metadata when configured
+- publishes artifacts to repo root and `frontend/public/`
+
+## Repo layout
+
+- `contracts/` Hardhat workspace for contracts, scripts, deployments, and tests
+- `frontend/` Next.js dashboard
+- `agent.json` generated agent registration artifact
+- `agent_log.json` generated audit artifact
+
+## Features
+
+- Human-vetoed escrow payments
+- Native and ERC-20 settlement
+- Direct funding and swap-backed funding
+- Localhost, Sepolia, and Celo Alfajores support
+- Telegram notifications
+- Private risk gate with local or Venice mode
+- MetaMask Smart Account and delegation support
+- ERC-8004-style agent artifacts
+- Configurable payment rail metadata for Locus-style positioning
+- ENS and Self identity metadata support
+
+## How It Works
+
+1. An agent receives a task and constructs a payment intent.
+2. The runner hashes the intent and evaluates risk privately.
+3. If allowed, the agent queues the payment onchain instead of transferring immediately.
+4. Telegram alerts and the dashboard expose the pending payment.
+5. The owner can veto before `unlocksAt`.
+6. If not vetoed, the keeper or any caller can execute after the window closes.
+
+## Tracks Targeted
+
+Primary targets:
+
+- Synthesis Open Track
+- Protocol Labs: Agents With Receipts / ERC-8004
+- Protocol Labs: Let the Agent Cook
+- MetaMask: Best Use of Delegations
+
+Strong secondary targets:
+
+- Uniswap: Agentic Finance
+- Celo: Best Agent on Celo
+- Locus: Best Use of Locus
+- Venice: Private Agents, Trusted Actions
+- ENS: Identity / Communication / Open Integration
+- Self: Best Self Agent ID Integration
+- Status Network: Go Gasless
+
+How the project maps:
+
+- ERC-8004 artifacts and audit logs support the Protocol Labs trust-and-receipts story.
+- Delegation tooling supports the MetaMask permissions story.
+- Swap-backed token funding supports the Uniswap finance story.
+- Alfajores support supports the Celo stablecoin/payment story.
+- Payment rail metadata supports the Locus controlled-wallet story.
+- ENS and Self metadata support identity-focused tracks.
+- Venice risk mode supports the private-reasoning trust story.
 
 ## Setup
 
+### Install
+
 1. Install dependencies:
-   - `"C:\\Program Files\\nodejs\\npm.cmd" install`
-2. Copy env template:
-   - `copy contracts\\.env.example contracts\\.env`
-3. For frontend env:
-   - Copy `frontend/.env.local.example` to `frontend/.env.local`
-   - Set `NEXT_PUBLIC_ESCROW_ADDRESS`
-   - Optional: set `NEXT_PUBLIC_SEPOLIA_RPC_URL`
-   - Optional: set `AUDIT_ARTIFACT_NETWORK=localhost|sepolia` for the manual refresh button
 
-## Local flow
+```powershell
+"C:\Program Files\nodejs\npm.cmd" install
+```
 
-1. Run tests:
-   - `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:test`
-2. Start local node (terminal A):
-   - `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:node`
-3. Deploy to localhost (terminal B):
-   - `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:deploy:local`
-4. Run keeper (terminal C):
-   - `KEEPER_ONCE=true "C:\\Program Files\\nodejs\\npm.cmd" run contracts:keeper`
-5. Start frontend:
-   - `"C:\\Program Files\\nodejs\\npm.cmd" run frontend:dev`
+2. Copy contract env template:
 
-## Telegram watcher
+```powershell
+copy contracts\.env.example contracts\.env
+```
 
-1. Fill `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` in `contracts/.env`
-2. Run on localhost:
-   - `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:watch:telegram:local`
-3. Run on Sepolia:
-   - `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:watch:telegram:sepolia`
+3. Copy frontend env template:
 
-Watcher behavior:
+```powershell
+copy frontend\.env.local.example frontend\.env.local
+```
 
-- Reads escrow address from `ESCROW_ADDRESS` or `contracts/deployments/<network>.json`
-- Polls `PaymentQueued` events and sends Telegram alerts
-- Persists block cursor in `contracts/state/telegram-watcher-<network>.json`
+## Local Run
 
-## Sepolia deploy
+### 1. Run tests
 
-Set in `contracts/.env`:
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:test
+```
 
-- `PRIVATE_KEY`
-- `SEPOLIA_RPC_URL`
-- Optional overrides: `ESCROW_OWNER`, `AUTHORIZED_AGENT`, `VETO_WINDOW_SECONDS`, `SPEND_LIMIT_WEI`, `INITIAL_FUND_WEI`
+### 2. Start the local node
 
-Deploy command:
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:node
+```
 
-- `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:deploy:sepolia`
+### 3. Deploy escrow
 
-Deployment metadata is written to `contracts/deployments/sepolia.json`.
+Native mode:
 
-## Day 3: agent identity + delegations
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:deploy:local
+```
 
-### Generate agent artifacts
+Token mode:
 
-1. Ensure the escrow is deployed and `ESCROW_ADDRESS` resolves from env or `contracts/deployments/<network>.json`
-2. Set optional metadata in `contracts/.env`:
-   - `AGENT_BASE_URL`
-   - `AGENT_NAME`
-   - `AGENT_DESCRIPTION`
-   - `AGENT_REGISTRY`
-   - `AGENT_ID`
-3. Generate artifacts:
-   - Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:artifacts:local`
-   - Sepolia: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:artifacts:sepolia`
+- set `SETTLEMENT_MODE=token` in `contracts/.env`
+- optional: set `INITIAL_FUND_TOKEN_UNITS`
 
-Generated files:
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:deploy:local
+```
 
-- `agent.json`
-- `agent_log.json`
-- `frontend/public/agent.json`
-- `frontend/public/agent_log.json`
-- `frontend/public/.well-known/agent-registration.json`
+### 4. Start Telegram watcher
 
-### Manual refresh from the frontend
+- set `TELEGRAM_BOT_TOKEN`
+- set `TELEGRAM_CHAT_ID`
 
-The `Refresh Audit Artifacts` button in the dashboard calls `POST /api/audit-artifacts/refresh`, which runs:
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:watch:telegram:local
+```
 
-- `contracts:artifacts:localhost` if `AUDIT_ARTIFACT_NETWORK=localhost`
-- `contracts:artifacts:sepolia` if `AUDIT_ARTIFACT_NETWORK=sepolia`
-
-This route is intended for local development and trusted operator use, because it can execute the artifact generation script on the same machine as the frontend server.
-
-### Deploy with a MetaMask smart account as the authorized agent
-
-Set in `contracts/.env`:
-
-- `SMART_ACCOUNT_OWNER_PRIVATE_KEY`
-- Optional: `SMART_ACCOUNT_DEPLOY_ENVIRONMENT=true` for localhost-only smart account environment deployment
-- Optional: leave `AUTHORIZED_AGENT` empty so the deploy script derives the smart account address automatically
-
-Then deploy:
-
-- Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:deploy:local`
-- Sepolia: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:deploy:sepolia`
-
-The deployment metadata now records:
-
-- `authorizationMode`
-- `smartAccountOwnerAddress`
-- `deploymentBlock`
-
-### Create delegation bundle
-
-Set in `contracts/.env`:
-
-- `SMART_ACCOUNT_OWNER_PRIVATE_KEY`
-- `AGENT_DELEGATE_PRIVATE_KEY`
-- Optional: `AGENT_SUBDELEGATE_PRIVATE_KEY`
-- Optional scope controls:
-  - `DELEGATION_SCOPE_TYPE=function-call`
-  - `DELEGATION_MAX_CALLS=25`
-  - `SUBDELEGATION_MAX_CALLS=5`
-  - `DELEGATION_EXPIRES_AT`
-  - `SUBDELEGATION_EXPIRES_AT`
-
-Generate signed delegation JSON:
-
-- Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:delegations:local`
-- Sepolia: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:delegations:sepolia`
-
-Output:
-
-- `contracts/delegations/<network>.json`
-
-The default delegation scope is a constrained call to `RageQuitEscrow.initiate(address,uint256,bytes32)`. The escrow contract's own `spendLimit` remains the effective per-payment cap, and the signed redelegation chain limits who can invoke it.
-
-## Day 4: agent loop
-
-### Run the agent loop
+### 5. Run the agent
 
 Set in `contracts/.env`:
 
 - `AGENT_TASK`
 - `AGENT_RECIPIENT`
-- Either `AGENT_AMOUNT_WEI` or `AGENT_AMOUNT_ETH`
-- Optional: `AGENT_REASONING_PROVIDER=local|openai`
-- Optional: `OPENAI_API_KEY`
-- Optional: `AGENT_RUNNER_PRIVATE_KEY`
+- either `AGENT_AMOUNT_WEI` or `AGENT_AMOUNT_ETH`
 
-Run the agent:
+Then run:
 
-- Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:run-agent:local`
-- Sepolia: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:run-agent:sepolia`
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:run-agent:local
+```
 
-Outputs:
+### 6. Execute expired payments
 
-- Builds reasoning before queueing
-- Hashes the structured intent before sending
-- Writes local run data to `contracts/runs/<network>.json`
-- Refreshes `agent_log.json` by default after a successful queue
+```powershell
+KEEPER_ONCE=true "C:\Program Files\nodejs\npm.cmd" run contracts:keeper
+```
 
-## Day 5: private risk gate
+### 7. Start frontend
 
-### Configure the risk gate
+Set in `frontend/.env.local`:
+
+- `NEXT_PUBLIC_ESCROW_ADDRESS`
+- optional: `NEXT_PUBLIC_TARGET_CHAIN=localhost`
+- optional: `AUDIT_ARTIFACT_NETWORK=localhost`
+
+Then run:
+
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run frontend:dev
+```
+
+## Sepolia Run
 
 Set in `contracts/.env`:
+
+- `PRIVATE_KEY`
+- `SEPOLIA_RPC_URL`
+- optional token mode values such as `SETTLEMENT_MODE`, `SETTLEMENT_TOKEN`, `SWAP_ROUTER_ADDRESS`
+
+Useful commands:
+
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:deploy:sepolia
+"C:\Program Files\nodejs\npm.cmd" run contracts:run-agent:sepolia
+"C:\Program Files\nodejs\npm.cmd" run contracts:artifacts:sepolia
+"C:\Program Files\nodejs\npm.cmd" run contracts:watch:telegram:sepolia
+```
+
+## Alfajores Run
+
+Set in `contracts/.env`:
+
+- `CELO_ALFAJORES_RPC_URL`
+- `CELO_PRIVATE_KEY` or reuse `PRIVATE_KEY`
+- `SETTLEMENT_MODE=token`
+- `SETTLEMENT_TOKEN=<token address>`
+
+Useful commands:
+
+```powershell
+"C:\Program Files\nodejs\npm.cmd" run contracts:deploy:alfajores
+"C:\Program Files\nodejs\npm.cmd" run contracts:run-agent:alfajores
+"C:\Program Files\nodejs\npm.cmd" run contracts:artifacts:alfajores
+"C:\Program Files\nodejs\npm.cmd" run contracts:watch:telegram:alfajores
+KEEPER_ONCE=true "C:\Program Files\nodejs\npm.cmd" run contracts:keeper:alfajores
+```
+
+For the frontend:
+
+- `NEXT_PUBLIC_TARGET_CHAIN=alfajores`
+- `NEXT_PUBLIC_ESCROW_ADDRESS=<deployed escrow>`
+- `NEXT_PUBLIC_ALFAJORES_RPC_URL=<rpc url>`
+
+## Optional Configuration
+
+### Risk gate
 
 - `RISK_PROVIDER=local|venice`
 - `RISK_THRESHOLD=70`
 - `RISK_HIGH_VALUE_WEI=500000000000000000`
-- Optional: `RISK_BLOCKED_RECIPIENTS=0xabc...,0xdef...`
-- Optional: `RISK_SUSPICIOUS_KEYWORDS=urgent,override,bypass,unknown`
-- For Venice mode: `VENICE_API_KEY`
-- Optional override: `VENICE_API_URL=https://api.venice.ai/api/v1/chat/completions`
-- Optional override: `VENICE_MODEL=venice-uncensored`
+- `RISK_BLOCKED_RECIPIENTS=...`
+- `RISK_SUSPICIOUS_KEYWORDS=...`
+- `VENICE_API_KEY=...`
 
-Behavior:
+### Swap-backed token funding
 
-- `local` computes a private deterministic score from amount, recipient denylist, suspicious keywords, and reasoning confidence.
-- `venice` calls Venice's OpenAI-compatible `chat/completions` API and falls back to local logic only when `VENICE_API_KEY` is absent.
-- If the verdict is `block_payment`, the payment is not queued onchain.
-- Both allow and block decisions are written to `contracts/runs/<network>.json`.
-- Risk decisions are published into `agent_log.json` whenever artifacts are refreshed.
+- `AGENT_FUNDING_MODE=swap-native`
+- `AGENT_SWAP_NATIVE_AMOUNT_WEI=...`
+- `AGENT_SWAP_NATIVE_AMOUNT_ETH=...`
+- `AGENT_SWAP_MIN_AMOUNT_OUT=...`
+- `SWAP_ROUTER_KIND=mock|uniswap-v3`
+- `SWAP_ROUTER_ADDRESS=...`
+- `UNISWAP_WRAPPED_NATIVE_TOKEN=...`
+- `UNISWAP_QUOTER_ADDRESS=...`
+- `UNISWAP_POOL_FEE=3000`
 
-### Venice integration steps
+### Delegations and smart accounts
 
-Venice is the private cognition layer in this repo: private reasoning over sensitive payment context, then a public onchain action only if the private risk gate allows it. The integration point is [agentRunner.js](C:/projects/ragequit-escrow/contracts/scripts/agentRunner.js), and it now matches Venice's OpenAI-compatible inference pattern.
+- `SMART_ACCOUNT_OWNER_PRIVATE_KEY`
+- `AGENT_DELEGATE_PRIVATE_KEY`
+- `AGENT_SUBDELEGATE_PRIVATE_KEY`
+- `DELEGATION_MAX_CALLS`
+- `SUBDELEGATION_MAX_CALLS`
 
-1. Set these in `contracts/.env`:
-   - `RISK_PROVIDER=venice`
-   - `VENICE_API_KEY=your-venice-inference-key`
-   - Optional: `VENICE_API_URL=https://api.venice.ai/api/v1/chat/completions`
-   - Optional: `VENICE_MODEL=venice-uncensored`
-   - `RISK_THRESHOLD=70`
-2. Keep your normal agent inputs set:
-   - `AGENT_TASK`
-   - `AGENT_RECIPIENT`
-   - `AGENT_AMOUNT_ETH` or `AGENT_AMOUNT_WEI`
-3. Run the agent:
-   - `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:run-agent:local`
-4. Check results:
-   - `contracts/runs/<network>.json`
-   - `agent_log.json`
-   - frontend audit panel
+### Payment rail metadata
 
-Outgoing Venice request shape:
+Useful for Locus-style positioning:
 
-```json
-{
-  "model": "venice-uncensored",
-  "temperature": 0,
-  "messages": [
-    {
-      "role": "system",
-      "content": "You are a private payment risk analyst. Review the proposed payment and return only a JSON object with keys riskScore, reasons, and verdict. riskScore must be an integer from 0 to 100. verdict must be queue_payment or block_payment. Keep reasons concise."
-    },
-    {
-      "role": "user",
-      "content": "{\"task\":\"Pay vendor invoice 42\",\"recipient\":\"0x1234...\",\"amountWei\":\"100000000000000000\",\"network\":\"localhost\",\"reasoning\":{...},\"metadata\":{\"escrowAddress\":\"0x5FbD...\"}}"
-    }
-  ]
-}
-```
+- `PAYMENT_RAIL_PROVIDER=locus`
+- `PAYMENT_RAIL_NETWORK=base|alfajores|sepolia|localhost`
+- `PAYMENT_RAIL_ASSET_SYMBOL=USDC`
+- `PAYMENT_RAIL_ASSET_ADDRESS=...`
+- `PAYMENT_RAIL_WALLET_ADDRESS=...`
+- `PAYMENT_RAIL_WALLET_LABEL=...`
+- `PAYMENT_RAIL_POLICY_URL=...`
 
-Expected model output inside `choices[0].message.content`:
+### ENS and Self identity metadata
 
-```json
-{
-  "riskScore": 82,
-  "reasons": [
-    "recipient is newly observed",
-    "task description contains urgency terms"
-  ],
-  "verdict": "block_payment"
-}
-```
+- `AGENT_ENS_NAME=...`
+- `OWNER_ENS_NAME=...`
+- `AUTHORIZED_AGENT_ENS_NAME=...`
+- `OWNER_DISPLAY_NAME=...`
+- `AUTHORIZED_AGENT_DISPLAY_NAME=...`
+- `ADDRESS_BOOK_JSON={...}`
+- `RECIPIENT_ENS_JSON={...}`
+- `SELF_VERIFICATION_ENABLED=true|false`
+- `SELF_VERIFIED=true|false`
+- `SELF_PROOF_URL=...`
 
-How the runner interprets it:
+## Generated Outputs
 
-- `verdict=block_payment` blocks immediately
-- otherwise `riskScore >= RISK_THRESHOLD` means `block_payment`
-- lower scores mean `queue_payment`
-- if `VENICE_API_KEY` is missing, the runner falls back to local risk logic
-- if Venice returns text around the JSON, the runner extracts the JSON object and parses it
-- if Venice returns no `reasons`, the runner records `venice risk score returned without reasons`
+- `contracts/deployments/<network>.json`
+- `contracts/runs/<network>.json`
+- `contracts/delegations/<network>.json`
+- `agent.json`
+- `agent_log.json`
+- `frontend/public/agent.json`
+- `frontend/public/agent_log.json`
 
-Security note:
+## Verification
 
-- Do not commit or share your Venice inference key.
-- If the key you pasted into chat was real, rotate it in Venice and update `contracts/.env`.
+Validated in this repo:
 
-### Verify allow path
+- contract test suite passes
+- frontend production build passes
 
-1. Set a benign task, recipient, and amount below both `SPEND_LIMIT_WEI` and `RISK_HIGH_VALUE_WEI`.
-2. Run:
-   - Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:run-agent:local`
-3. Confirm:
-   - A new `queued_onchain` entry appears in `contracts/runs/localhost.json`
-   - A new pending payment appears in the dashboard
-   - A matching `Allowed` verdict appears in the audit panel after artifact refresh
+Not included in this repo automation:
 
-### Verify block path
-
-Use either of these:
-
-- Put the chosen recipient into `RISK_BLOCKED_RECIPIENTS`
-- Or use a suspicious task plus a low enough `RISK_THRESHOLD`
-- Or have Venice return `verdict=block_payment`
-- Or have Venice return a score above the threshold
-
-Then run:
-
-- Localhost: `"C:\\Program Files\\nodejs\\npm.cmd" run contracts:run-agent:local`
-
-Confirm:
-
-- A new `blocked_by_risk` entry appears in `contracts/runs/localhost.json`
-- No new pending payment is queued onchain
-- A matching `Blocked` verdict appears in the audit panel after artifact refresh
+- final hackathon video recording
+- submission form completion
+- mainnet deployment execution

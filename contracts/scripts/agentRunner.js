@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const hre = require("hardhat");
 require("dotenv").config();
+const { buildPaymentRailMetadata, resolveAddressLabel } = require("./lib/metadata");
 
 function resolveDeployment(networkName) {
   const deploymentPath = path.join(__dirname, "..", "deployments", `${networkName}.json`);
@@ -47,6 +48,33 @@ function ensureTask() {
   }
 
   return task;
+}
+function isHexBytes32(value) {
+  return typeof value === "string" && /^0x[0-9a-fA-F]{64}$/.test(value);
+}
+
+function resolveFundingReference(ethers, rawValue) {
+  if (!rawValue) {
+    return ethers.ZeroHash;
+  }
+
+  return isHexBytes32(rawValue) ? rawValue : ethers.keccak256(ethers.toUtf8Bytes(rawValue));
+}
+
+function ceilDiv(numerator, denominator) {
+  return (numerator + denominator - 1n) / denominator;
+}
+
+function resolveSwapNativeAmountWei(ethers) {
+  if (process.env.AGENT_SWAP_NATIVE_AMOUNT_WEI) {
+    return BigInt(process.env.AGENT_SWAP_NATIVE_AMOUNT_WEI);
+  }
+
+  if (process.env.AGENT_SWAP_NATIVE_AMOUNT_ETH) {
+    return ethers.parseEther(process.env.AGENT_SWAP_NATIVE_AMOUNT_ETH);
+  }
+
+  return null;
 }
 
 function buildFallbackReasoning({ task, recipient, amountWei, networkName }) {
@@ -304,6 +332,388 @@ function buildIntentPayload({ task, recipient, amountWei, networkName, escrowAdd
     reasoning,
   };
 }
+function isTruthy(value, fallback = false) {
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+
+  return String(value).toLowerCase() === "true";
+}
+
+function resolveSwapRouterKind(deployment) {
+  if (process.env.SWAP_ROUTER_KIND) {
+    return process.env.SWAP_ROUTER_KIND.toLowerCase();
+  }
+
+  if (deployment?.swapRouterKind) {
+    return String(deployment.swapRouterKind).toLowerCase();
+  }
+
+  return deployment?.mockSwapRouterAddress ? "mock" : "uniswap-v3";
+}
+
+function resolveSwapMinAmountOut(amountWei, quotedAmountOut) {
+  if (process.env.AGENT_SWAP_MIN_AMOUNT_OUT) {
+    return BigInt(process.env.AGENT_SWAP_MIN_AMOUNT_OUT);
+  }
+
+  if (quotedAmountOut !== null) {
+    const slippageBps = BigInt(process.env.UNISWAP_SLIPPAGE_BPS || "500");
+    const boundedSlippageBps = slippageBps > 10_000n ? 10_000n : slippageBps;
+    const minFromQuote = (quotedAmountOut * (10_000n - boundedSlippageBps)) / 10_000n;
+    return minFromQuote > amountWei ? minFromQuote : amountWei;
+  }
+
+  return amountWei;
+}
+
+function resolveSwapDeadline() {
+  const deadlineSeconds = Number(process.env.UNISWAP_DEADLINE_SECONDS || "300");
+  return Math.floor(Date.now() / 1000) + deadlineSeconds;
+}
+
+function buildSwapQuoteId({ ethers, task, recipient, amountWei, networkName, escrowAddress }) {
+  return ethers.keccak256(
+    ethers.toUtf8Bytes(
+      JSON.stringify({
+        version: 1,
+        type: "swap-native-for-token",
+        task,
+        recipient,
+        amountWei: amountWei.toString(),
+        network: networkName,
+        escrowAddress,
+        createdAt: new Date().toISOString(),
+      })
+    )
+  );
+}
+
+async function prepareMockFunding({
+  ethers,
+  swapRouterAddress,
+  task,
+  recipient,
+  amountWei,
+  networkName,
+  escrowAddress,
+  settlementMode,
+  settlementToken,
+  fundingMode,
+  signer,
+}) {
+  const router = await ethers.getContractAt(
+    [
+      "function rateNumerator() external view returns (uint256)",
+      "function rateDenominator() external view returns (uint256)",
+      "function quoteExactNativeForToken(uint256 amountIn) external view returns (uint256)",
+      "function swapExactNativeForToken(address token,address recipient,uint256 minAmountOut,bytes32 quoteId) external payable returns (uint256 amountOut)",
+    ],
+    swapRouterAddress
+  );
+
+  const [rateNumerator, rateDenominator] = await Promise.all([
+    router.rateNumerator(),
+    router.rateDenominator(),
+  ]);
+
+  const configuredNativeAmountWei = resolveSwapNativeAmountWei(ethers);
+  const nativeAmountInWei =
+    configuredNativeAmountWei ??
+    ceilDiv(BigInt(amountWei) * BigInt(rateDenominator), BigInt(rateNumerator));
+
+  if (nativeAmountInWei <= 0n) {
+    throw new Error("Resolved native swap input must be greater than zero.");
+  }
+
+  const quotedAmountOut = await router.quoteExactNativeForToken(nativeAmountInWei);
+  if (quotedAmountOut < amountWei) {
+    throw new Error(
+      "Swap quote " + quotedAmountOut + " is below requested token payout " + amountWei + ". Increase AGENT_SWAP_NATIVE_AMOUNT_WEI or reduce AGENT_AMOUNT_WEI."
+    );
+  }
+
+  const quoteId = buildSwapQuoteId({
+    ethers,
+    task,
+    recipient,
+    amountWei,
+    networkName,
+    escrowAddress,
+  });
+
+  const swapTx = await router
+    .connect(signer)
+    .swapExactNativeForToken(settlementToken, escrowAddress, amountWei, quoteId, {
+      value: nativeAmountInWei,
+    });
+  const swapReceipt = await swapTx.wait();
+
+  return {
+    settlementMode,
+    settlementToken,
+    fundingMode,
+    fundingReference: quoteId,
+    fundingDetails: {
+      routerKind: "mock",
+      swapRouterAddress,
+      swapQuoteId: quoteId,
+      swapTransactionHash: swapReceipt.hash,
+      swapBlockNumber: swapReceipt.blockNumber,
+      nativeAmountInWei: nativeAmountInWei.toString(),
+      quotedAmountOut: quotedAmountOut.toString(),
+      minAmountOut: amountWei.toString(),
+    },
+  };
+}
+
+async function quoteUniswapV3AmountOut({ ethers, quoterAddress, wrappedNativeToken, settlementToken, amountIn, poolFee }) {
+  if (!quoterAddress) {
+    return null;
+  }
+
+  const quoter = await ethers.getContractAt(
+    [
+      "function quoteExactInputSingle((address tokenIn,address tokenOut,uint256 amountIn,uint24 fee,uint160 sqrtPriceLimitX96) params) external returns (uint256 amountOut,uint160 sqrtPriceX96After,uint32 initializedTicksCrossed,uint256 gasEstimate)",
+    ],
+    quoterAddress
+  );
+
+  const quote = await quoter.quoteExactInputSingle.staticCall({
+    tokenIn: wrappedNativeToken,
+    tokenOut: settlementToken,
+    amountIn,
+    fee: poolFee,
+    sqrtPriceLimitX96: 0,
+  });
+
+  return BigInt(quote.amountOut ?? quote[0]);
+}
+
+async function prepareUniswapV3Funding({
+  ethers,
+  deployment,
+  swapRouterAddress,
+  task,
+  recipient,
+  amountWei,
+  networkName,
+  escrowAddress,
+  settlementMode,
+  settlementToken,
+  fundingMode,
+  signer,
+}) {
+  const wrappedNativeToken =
+    process.env.UNISWAP_WRAPPED_NATIVE_TOKEN || deployment?.wrappedNativeToken || null;
+  const quoterAddress = process.env.UNISWAP_QUOTER_ADDRESS || deployment?.uniswapQuoterAddress || null;
+  const poolFee = Number(process.env.UNISWAP_POOL_FEE || deployment?.uniswapPoolFee || "3000");
+  const routerHasDeadline = isTruthy(
+    process.env.UNISWAP_ROUTER_HAS_DEADLINE,
+    Boolean(deployment?.uniswapRouterHasDeadline)
+  );
+
+  if (!wrappedNativeToken) {
+    throw new Error(
+      "Real Uniswap funding requires UNISWAP_WRAPPED_NATIVE_TOKEN or wrappedNativeToken in deployment metadata."
+    );
+  }
+
+  const nativeAmountInWei = resolveSwapNativeAmountWei(ethers);
+  if (nativeAmountInWei === null || nativeAmountInWei <= 0n) {
+    throw new Error(
+      "Real router funding requires AGENT_SWAP_NATIVE_AMOUNT_WEI or AGENT_SWAP_NATIVE_AMOUNT_ETH."
+    );
+  }
+
+  const token = await ethers.getContractAt(
+    ["function balanceOf(address account) external view returns (uint256)"],
+    settlementToken
+  );
+  const beforeBalance = await token.balanceOf(escrowAddress);
+  const quotedAmountOut = await quoteUniswapV3AmountOut({
+    ethers,
+    quoterAddress,
+    wrappedNativeToken,
+    settlementToken,
+    amountIn: nativeAmountInWei,
+    poolFee,
+  });
+  const minAmountOut = resolveSwapMinAmountOut(amountWei, quotedAmountOut);
+  if (quotedAmountOut !== null && quotedAmountOut < minAmountOut) {
+    throw new Error(
+      "Quoted output " + quotedAmountOut + " is below required minimum " + minAmountOut + ". Reduce AGENT_SWAP_MIN_AMOUNT_OUT, increase AGENT_SWAP_NATIVE_AMOUNT_WEI, or adjust slippage."
+    );
+  }
+
+  const quoteId = resolveFundingReference(
+    ethers,
+    process.env.AGENT_FUNDING_REFERENCE ||
+      buildSwapQuoteId({
+        ethers,
+        task,
+        recipient,
+        amountWei,
+        networkName,
+        escrowAddress,
+      })
+  );
+
+  const abi = routerHasDeadline
+    ? [
+        "function exactInputSingle((address tokenIn,address tokenOut,uint24 fee,address recipient,uint256 deadline,uint256 amountIn,uint256 amountOutMinimum,uint160 sqrtPriceLimitX96) params) external payable returns (uint256 amountOut)",
+      ]
+    : [
+        "function exactInputSingle((address tokenIn,address tokenOut,uint24 fee,address recipient,uint256 amountIn,uint256 amountOutMinimum,uint160 sqrtPriceLimitX96) params) external payable returns (uint256 amountOut)",
+      ];
+  const router = await ethers.getContractAt(abi, swapRouterAddress);
+
+  const params = routerHasDeadline
+    ? {
+        tokenIn: wrappedNativeToken,
+        tokenOut: settlementToken,
+        fee: poolFee,
+        recipient: escrowAddress,
+        deadline: resolveSwapDeadline(),
+        amountIn: nativeAmountInWei,
+        amountOutMinimum: minAmountOut,
+        sqrtPriceLimitX96: 0,
+      }
+    : {
+        tokenIn: wrappedNativeToken,
+        tokenOut: settlementToken,
+        fee: poolFee,
+        recipient: escrowAddress,
+        amountIn: nativeAmountInWei,
+        amountOutMinimum: minAmountOut,
+        sqrtPriceLimitX96: 0,
+      };
+
+  const swapTx = await router.connect(signer).exactInputSingle(params, {
+    value: nativeAmountInWei,
+  });
+  const swapReceipt = await swapTx.wait();
+  const afterBalance = await token.balanceOf(escrowAddress);
+  const fundedAmountOut = afterBalance - beforeBalance;
+
+  if (fundedAmountOut < amountWei) {
+    throw new Error(
+      "Swap funded " + fundedAmountOut + " settlement-token units, below required payout " + amountWei + "."
+    );
+  }
+
+  return {
+    settlementMode,
+    settlementToken,
+    fundingMode,
+    fundingReference: quoteId,
+    fundingDetails: {
+      routerKind: "uniswap-v3",
+      swapRouterAddress,
+      swapQuoteId: quoteId,
+      swapTransactionHash: swapReceipt.hash,
+      swapBlockNumber: swapReceipt.blockNumber,
+      nativeAmountInWei: nativeAmountInWei.toString(),
+      quotedAmountOut: quotedAmountOut === null ? null : quotedAmountOut.toString(),
+      actualAmountOut: fundedAmountOut.toString(),
+      minAmountOut: minAmountOut.toString(),
+      wrappedNativeToken,
+      quoterAddress,
+      poolFee,
+      routerHasDeadline,
+    },
+  };
+}
+
+async function maybePrepareFunding({
+  ethers,
+  deployment,
+  networkName,
+  task,
+  recipient,
+  amountWei,
+  escrowAddress,
+  signer,
+}) {
+  const settlementMode = (process.env.SETTLEMENT_MODE || deployment?.settlementMode || "native").toLowerCase();
+  const settlementToken = process.env.SETTLEMENT_TOKEN || deployment?.settlementToken || ethers.ZeroAddress;
+  const swapRouterAddress = process.env.SWAP_ROUTER_ADDRESS || deployment?.swapRouterAddress || null;
+  const swapRouterKind = resolveSwapRouterKind(deployment);
+  const requestedFundingMode = (process.env.AGENT_FUNDING_MODE || "").toLowerCase();
+  const fundingMode =
+    settlementMode === "token"
+      ? requestedFundingMode || "direct"
+      : requestedFundingMode || "native";
+
+  if (settlementMode !== "token") {
+    return {
+      settlementMode,
+      settlementToken,
+      fundingMode,
+      fundingReference: ethers.ZeroHash,
+      fundingDetails: null,
+    };
+  }
+
+  if (fundingMode === "direct") {
+    return {
+      settlementMode,
+      settlementToken,
+      fundingMode,
+      fundingReference: resolveFundingReference(ethers, process.env.AGENT_FUNDING_REFERENCE),
+      fundingDetails: {
+        routerKind: swapRouterAddress ? swapRouterKind : null,
+      },
+    };
+  }
+
+  if (fundingMode !== "swap-native") {
+    throw new Error(
+      "Unsupported AGENT_FUNDING_MODE " + fundingMode + ". Use direct or swap-native for token settlement."
+    );
+  }
+
+  if (!swapRouterAddress) {
+    throw new Error(
+      "AGENT_FUNDING_MODE=swap-native requires swapRouterAddress in deployment metadata or SWAP_ROUTER_ADDRESS in env."
+    );
+  }
+
+  if (swapRouterKind === "mock") {
+    return prepareMockFunding({
+      ethers,
+      swapRouterAddress,
+      task,
+      recipient,
+      amountWei,
+      networkName,
+      escrowAddress,
+      settlementMode,
+      settlementToken,
+      fundingMode,
+      signer,
+    });
+  }
+
+  if (swapRouterKind === "uniswap-v3") {
+    return prepareUniswapV3Funding({
+      ethers,
+      deployment,
+      swapRouterAddress,
+      task,
+      recipient,
+      amountWei,
+      networkName,
+      escrowAddress,
+      settlementMode,
+      settlementToken,
+      fundingMode,
+      signer,
+    });
+  }
+
+  throw new Error("Unsupported SWAP_ROUTER_KIND " + swapRouterKind + ". Use mock or uniswap-v3.");
+}
 
 async function resolveAgentSigner(ethers, provider, authorizedAgent) {
   const explicitKey = process.env.AGENT_RUNNER_PRIVATE_KEY || process.env.PRIVATE_KEY;
@@ -385,6 +795,9 @@ async function main() {
     throw new Error(`Amount ${amountWei} exceeds contract spendLimit ${spendLimit}.`);
   }
 
+  const paymentRail = buildPaymentRailMetadata(network.name, deployment || {});
+  const recipientLabel = resolveAddressLabel(recipient, deployment || {});
+
   const reasoningInput = {
     task,
     recipient,
@@ -409,7 +822,9 @@ async function main() {
     authorizedAgent,
     task,
     recipient,
+    recipientLabel,
     amountWei: amountWei.toString(),
+    paymentRail,
     reasoning,
     riskAssessment,
   };
@@ -460,8 +875,24 @@ async function main() {
   const intentHash = ethers.keccak256(ethers.toUtf8Bytes(intentJson));
 
   const signer = await resolveAgentSigner(ethers, ethers.provider, authorizedAgent);
-  const tx = await contract.connect(signer).initiate(recipient, amountWei, intentHash);
-  const receipt = await tx.wait();
+  const funding = await maybePrepareFunding({
+    ethers,
+    deployment,
+    networkName: network.name,
+    task,
+    recipient,
+    amountWei,
+    escrowAddress,
+    signer,
+  });
+
+  const queueTx =
+    funding.fundingReference === ethers.ZeroHash
+      ? await contract.connect(signer).initiate(recipient, amountWei, intentHash)
+      : await contract
+          .connect(signer)
+          .initiateWithFundingReference(recipient, amountWei, intentHash, funding.fundingReference);
+  const receipt = await queueTx.wait();
 
   const paymentQueuedLog = receipt.logs
     .map((log) => {
@@ -476,6 +907,11 @@ async function main() {
   const runRecord = {
     ...baseRunRecord,
     status: "queued_onchain",
+    settlementMode: funding.settlementMode,
+    settlementToken: funding.settlementToken,
+    fundingMode: funding.fundingMode,
+    fundingReference: funding.fundingReference,
+    fundingDetails: funding.fundingDetails,
     intentHash,
     intent: intentPayload,
     paymentId: paymentQueuedLog ? paymentQueuedLog.args.paymentId.toString() : null,
@@ -496,3 +932,10 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+
+
+
+
+
+

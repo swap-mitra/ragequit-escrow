@@ -9,7 +9,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { rageQuitEscrowAbi } from "../lib/contracts/rageQuitEscrow";
-import { hardhatLocal } from "../lib/wagmi";
+import { appChainId } from "../lib/wagmi";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 
@@ -18,6 +18,7 @@ type PaymentTuple = readonly [
   `0x${string}`,
   bigint,
   bigint,
+  `0x${string}`,
   `0x${string}`,
   boolean,
   boolean,
@@ -51,7 +52,7 @@ export function PendingPayments() {
     address: contractAddress,
     abi: rageQuitEscrowAbi,
     functionName: "owner",
-    chainId: hardhatLocal.id,
+    chainId: appChainId,
     query: {
       enabled: Boolean(configuredAddress),
       refetchInterval: 5000,
@@ -67,7 +68,7 @@ export function PendingPayments() {
     address: contractAddress,
     abi: rageQuitEscrowAbi,
     functionName: "nextPaymentId",
-    chainId: hardhatLocal.id,
+    chainId: appChainId,
     query: {
       enabled: Boolean(configuredAddress),
       refetchInterval: 5000,
@@ -98,7 +99,7 @@ export function PendingPayments() {
       address: contractAddress,
       abi: rageQuitEscrowAbi,
       functionName: "pendingPayments",
-      chainId: hardhatLocal.id,
+      chainId: appChainId,
       args: [id],
     })),
     query: {
@@ -120,7 +121,7 @@ export function PendingPayments() {
     error: vetoConfirmError,
   } = useWaitForTransactionReceipt({
     hash: vetoHash,
-    chainId: hardhatLocal.id,
+    chainId: appChainId,
   });
 
   useEffect(() => {
@@ -189,8 +190,8 @@ export function PendingPayments() {
     const recipient = payment[1];
     const amount = payment[2];
     const unlocksAt = payment[3];
-    const vetoed = payment[5];
-    const executed = payment[6];
+    const vetoed = payment[6];
+    const executed = payment[7];
     const remaining = unlocksAt > now ? unlocksAt - now : 0n;
     const status = vetoed ? "Vetoed" : executed ? "Executed" : "Pending";
     const chipClass = vetoed
@@ -331,3 +332,5 @@ function compactWei(value: bigint) {
 
   return `${raw.slice(0, 4)}...${raw.slice(-4)} wei`;
 }
+
+

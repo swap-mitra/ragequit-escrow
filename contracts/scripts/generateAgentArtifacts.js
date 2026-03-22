@@ -2,6 +2,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 const hre = require("hardhat");
 require("dotenv").config();
+const {
+  ZERO_ADDRESS,
+  parseOptionalJson,
+  buildIdentityMetadata,
+  buildPaymentRailMetadata,
+  resolveAddressLabel,
+} = require("./lib/metadata");
 
 function resolveDeployment(networkName) {
   const deploymentPath = path.join(__dirname, "..", "deployments", `${networkName}.json`);
@@ -36,19 +43,7 @@ function mkdirFor(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
 
-function parseOptionalJson(value, fallback) {
-  if (!value) {
-    return fallback;
-  }
-
-  try {
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
-}
-
-function buildServices(baseUrl, agentWalletAddress) {
+function buildServices(baseUrl, agentWalletAddress, identityMetadata, paymentRail) {
   const services = [
     {
       name: "web",
@@ -70,20 +65,34 @@ function buildServices(baseUrl, agentWalletAddress) {
     },
   ];
 
-  const ensName = process.env.AGENT_ENS_NAME;
-  if (ensName) {
+  if (identityMetadata.agentEnsName) {
     services.push({
       name: "ENS",
-      endpoint: ensName,
+      endpoint: identityMetadata.agentEnsName,
       version: "v1",
     });
   }
 
-  const email = process.env.AGENT_EMAIL;
-  if (email) {
+  if (process.env.AGENT_EMAIL) {
     services.push({
       name: "email",
-      endpoint: email,
+      endpoint: process.env.AGENT_EMAIL,
+    });
+  }
+
+  if (paymentRail.walletAddress) {
+    services.push({
+      name: `${paymentRail.provider}-rail`,
+      endpoint: paymentRail.walletAddress,
+      version: paymentRail.assetSymbol || undefined,
+    });
+  }
+
+  if (identityMetadata.self.proofUrl) {
+    services.push({
+      name: "Self",
+      endpoint: identityMetadata.self.proofUrl,
+      version: identityMetadata.self.verified ? "verified" : "pending",
     });
   }
 
@@ -107,7 +116,22 @@ function buildRegistrations() {
   return [];
 }
 
-function buildRiskDecisions(runs) {
+function buildSupportedTrust(identityMetadata) {
+  const baseTrust = parseOptionalJson(process.env.AGENT_SUPPORTED_TRUST_JSON, ["reputation", "validation"]);
+  const values = new Set(baseTrust);
+
+  if (identityMetadata.agentEnsName || identityMetadata.ownerEnsName || identityMetadata.authorizedAgentEnsName) {
+    values.add("ens-identity");
+  }
+
+  if (identityMetadata.self.verified) {
+    values.add("self-verification");
+  }
+
+  return Array.from(values);
+}
+
+function buildRiskDecisions(runs, deployment) {
   return runs
     .filter((run) => run && run.riskAssessment)
     .map((run) => ({
@@ -115,6 +139,7 @@ function buildRiskDecisions(runs) {
       status: run.status || "unknown",
       task: run.task,
       recipient: run.recipient,
+      recipientLabel: run.recipientLabel || resolveAddressLabel(run.recipient, deployment),
       amountWei: run.amountWei,
       paymentId: run.paymentId,
       transactionHash: run.transactionHash,
@@ -128,8 +153,8 @@ function buildRiskDecisions(runs) {
 
 async function main() {
   const { ethers, network } = hre;
-  const deployment = resolveDeployment(network.name);
-  const escrowAddress = process.env.ESCROW_ADDRESS || deployment?.escrowAddress;
+  const deployment = resolveDeployment(network.name) || {};
+  const escrowAddress = process.env.ESCROW_ADDRESS || deployment.escrowAddress;
 
   if (!escrowAddress) {
     throw new Error(
@@ -145,7 +170,7 @@ async function main() {
   const chainId = Number((await ethers.provider.getNetwork()).chainId);
   const contract = await ethers.getContractAt("RageQuitEscrow", escrowAddress);
   const latestBlock = await ethers.provider.getBlockNumber();
-  const fromBlock = Number(process.env.AGENT_LOG_FROM_BLOCK || deployment?.deploymentBlock || 0);
+  const fromBlock = Number(process.env.AGENT_LOG_FROM_BLOCK || deployment.deploymentBlock || 0);
   const decisionEvents = await contract.queryFilter(contract.filters.PaymentDecisionLogged(), fromBlock, latestBlock);
   const runLog = resolveRuns(network.name);
 
@@ -156,6 +181,8 @@ async function main() {
     contract.spendLimit(),
   ]);
 
+  const identityMetadata = buildIdentityMetadata(deployment);
+  const paymentRail = buildPaymentRailMetadata(network.name, deployment);
   const baseUrl = (process.env.AGENT_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
   const name = process.env.AGENT_NAME || "RageQuit Escrow";
   const description =
@@ -163,22 +190,26 @@ async function main() {
     "Human-vetoed autonomous payment agent that queues payouts onchain and exposes a revocable execution window.";
   const image = process.env.AGENT_IMAGE_URL || `${baseUrl}/agent-avatar.svg`;
   const registrations = buildRegistrations();
-  const supportedTrust = parseOptionalJson(
-    process.env.AGENT_SUPPORTED_TRUST_JSON,
-    ["reputation", "validation"]
-  );
+  const supportedTrust = buildSupportedTrust(identityMetadata);
 
   const agentCard = {
     type: "https://eips.ethereum.org/EIPS/eip-8004#registration-v1",
     name,
     description,
     image,
-    services: buildServices(baseUrl, authorizedAgent),
+    services: buildServices(baseUrl, authorizedAgent, identityMetadata, paymentRail),
     x402Support: false,
     active: true,
     registrations,
     supportedTrust,
+    identities: identityMetadata,
+    paymentRail,
   };
+
+  const settlementMode =
+    process.env.SETTLEMENT_MODE ||
+    deployment.settlementMode ||
+    (deployment.settlementToken && deployment.settlementToken !== ZERO_ADDRESS ? "token" : "native");
 
   const agentLog = {
     type: `${baseUrl}/schemas/agent-log-v1`,
@@ -187,23 +218,37 @@ async function main() {
     chainId,
     escrowAddress,
     owner,
+    ownerLabel: resolveAddressLabel(owner, deployment),
     authorizedAgent,
+    authorizedAgentLabel: resolveAddressLabel(authorizedAgent, deployment),
     vetoWindowSeconds: vetoWindow.toString(),
     spendLimitWei: spendLimit.toString(),
+    settlementMode,
+    settlementToken: process.env.SETTLEMENT_TOKEN || deployment.settlementToken || ZERO_ADDRESS,
+    swapRouterAddress: process.env.SWAP_ROUTER_ADDRESS || deployment.swapRouterAddress || null,
+    swapRouterKind: process.env.SWAP_ROUTER_KIND || deployment.swapRouterKind || null,
+    wrappedNativeToken: process.env.UNISWAP_WRAPPED_NATIVE_TOKEN || deployment.wrappedNativeToken || null,
+    uniswapQuoterAddress: process.env.UNISWAP_QUOTER_ADDRESS || deployment.uniswapQuoterAddress || null,
+    paymentRail,
+    identities: identityMetadata,
     decisions: decisionEvents.map((event) => ({
       paymentId: event.args.paymentId.toString(),
       decisionType: Number(event.args.decisionType),
       decisionLabel: ["queued", "vetoed", "executed"][Number(event.args.decisionType)] || "unknown",
       actor: event.args.actor,
+      actorLabel: resolveAddressLabel(event.args.actor, deployment),
       agent: event.args.agent,
+      agentLabel: resolveAddressLabel(event.args.agent, deployment),
       recipient: event.args.recipient,
+      recipientLabel: resolveAddressLabel(event.args.recipient, deployment),
       amountWei: event.args.amount.toString(),
       intentHash: event.args.intentHash,
+      fundingReference: event.args.fundingReference,
       timestamp: event.args.timestamp.toString(),
       transactionHash: event.transactionHash,
       blockNumber: event.blockNumber,
     })),
-    riskDecisions: buildRiskDecisions(runLog.runs),
+    riskDecisions: buildRiskDecisions(runLog.runs, deployment),
   };
 
   const repoRoot = path.join(__dirname, "..", "..");

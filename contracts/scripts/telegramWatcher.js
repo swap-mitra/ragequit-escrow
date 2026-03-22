@@ -2,23 +2,31 @@ const fs = require("node:fs");
 const path = require("node:path");
 const hre = require("hardhat");
 require("dotenv").config();
+const {
+  buildIdentityMetadata,
+  buildPaymentRailMetadata,
+  resolveAddressLabel,
+} = require("./lib/metadata");
 
-function resolveEscrowAddress(networkName) {
-  if (process.env.ESCROW_ADDRESS) {
-    return process.env.ESCROW_ADDRESS;
-  }
-
+function resolveDeployment(networkName) {
   const deploymentPath = path.join(__dirname, "..", "deployments", `${networkName}.json`);
   if (!fs.existsSync(deploymentPath)) {
     return null;
   }
 
   try {
-    const deployment = JSON.parse(fs.readFileSync(deploymentPath, "utf8"));
-    return deployment.escrowAddress || null;
+    return JSON.parse(fs.readFileSync(deploymentPath, "utf8"));
   } catch {
     return null;
   }
+}
+
+function resolveEscrowAddress(networkName, deployment) {
+  if (process.env.ESCROW_ADDRESS) {
+    return process.env.ESCROW_ADDRESS;
+  }
+
+  return deployment?.escrowAddress || null;
 }
 
 function getStateFilePath(networkName) {
@@ -66,7 +74,12 @@ function toShortAddress(address) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
-function formatMessage(networkName, escrowAddress, event) {
+function describeAddress(address, deployment) {
+  const label = resolveAddressLabel(address, deployment);
+  return label ? `${label} (${toShortAddress(address)})` : toShortAddress(address);
+}
+
+function formatMessage(networkName, escrowAddress, event, deployment) {
   const paymentId = event.args.paymentId.toString();
   const agent = event.args.agent;
   const recipient = event.args.recipient;
@@ -74,20 +87,36 @@ function formatMessage(networkName, escrowAddress, event) {
   const unlocksAt = Number(event.args.unlocksAt);
   const unlockIso = new Date(unlocksAt * 1000).toISOString();
   const txHash = event.transactionHash;
+  const identityMetadata = buildIdentityMetadata(deployment);
+  const paymentRail = buildPaymentRailMetadata(networkName, deployment);
 
-  return [
+  const lines = [
     `RageQuitEscrow alert (${networkName})`,
     `PaymentQueued #${paymentId}`,
-    `Escrow: ${toShortAddress(escrowAddress)}`,
-    `Agent: ${toShortAddress(agent)}`,
-    `Recipient: ${toShortAddress(recipient)}`,
+    `Escrow: ${describeAddress(escrowAddress, deployment)}`,
+    `Agent: ${describeAddress(agent, deployment)}`,
+    `Recipient: ${describeAddress(recipient, deployment)}`,
     `Amount (wei): ${amountWei}`,
     `Unlocks at: ${unlockIso}`,
-    `Tx: ${txHash}`,
-  ].join("\n");
+  ];
+
+  if (paymentRail.provider) {
+    lines.push(`Rail: ${paymentRail.provider}${paymentRail.assetSymbol ? ` ${paymentRail.assetSymbol}` : ""}`);
+  }
+
+  if (identityMetadata.agentEnsName) {
+    lines.push(`Agent ENS: ${identityMetadata.agentEnsName}`);
+  }
+
+  if (identityMetadata.self.verified) {
+    lines.push(`Operator ID: Self verified`);
+  }
+
+  lines.push(`Tx: ${txHash}`);
+  return lines.join("\n");
 }
 
-async function processQueuedPayments(contract, networkName, escrowAddress, fromBlock, toBlock, botToken, chatId) {
+async function processQueuedPayments(contract, networkName, escrowAddress, deployment, fromBlock, toBlock, botToken, chatId) {
   if (fromBlock > toBlock) {
     return;
   }
@@ -95,7 +124,7 @@ async function processQueuedPayments(contract, networkName, escrowAddress, fromB
   const events = await contract.queryFilter(contract.filters.PaymentQueued(), fromBlock, toBlock);
 
   for (const event of events) {
-    const message = formatMessage(networkName, escrowAddress, event);
+    const message = formatMessage(networkName, escrowAddress, event, deployment);
     await sendTelegramMessage(botToken, chatId, message);
     console.log(`Sent Telegram alert for payment #${event.args.paymentId.toString()} in tx ${event.transactionHash}`);
   }
@@ -103,6 +132,7 @@ async function processQueuedPayments(contract, networkName, escrowAddress, fromB
 
 async function main() {
   const { ethers, network } = hre;
+  const deployment = resolveDeployment(network.name) || {};
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -110,7 +140,7 @@ async function main() {
     throw new Error("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID in environment.");
   }
 
-  const escrowAddress = resolveEscrowAddress(network.name);
+  const escrowAddress = resolveEscrowAddress(network.name, deployment);
   if (!escrowAddress) {
     throw new Error(
       `Missing ESCROW_ADDRESS and no deployment file found at contracts/deployments/${network.name}.json.`
@@ -144,7 +174,7 @@ async function main() {
       fromBlock = Math.max(0, latestBlock - 100);
     }
 
-    await processQueuedPayments(contract, network.name, escrowAddress, fromBlock, latestBlock, botToken, chatId);
+    await processQueuedPayments(contract, network.name, escrowAddress, deployment, fromBlock, latestBlock, botToken, chatId);
 
     state.lastProcessedBlock = latestBlock;
     saveWatcherState(network.name, state);

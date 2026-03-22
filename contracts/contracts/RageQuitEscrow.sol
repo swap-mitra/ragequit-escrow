@@ -1,6 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+interface IERC20Minimal {
+    function balanceOf(address account) external view returns (uint256);
+
+    function transfer(address to, uint256 amount) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+}
+
 contract RageQuitEscrow {
     enum DecisionType {
         Queued,
@@ -14,6 +26,7 @@ contract RageQuitEscrow {
         uint256 amount;
         uint256 unlocksAt;
         bytes32 intentHash;
+        bytes32 fundingReference;
         bool vetoed;
         bool executed;
     }
@@ -28,12 +41,15 @@ contract RageQuitEscrow {
     error PaymentNotFound();
     error PaymentAlreadyVetoed();
     error PaymentAlreadyExecuted();
+    error InvalidFundingMode();
     error VetoWindowClosed();
     error VetoWindowOpen();
     error TransferFailed();
+    error TokenTransferFailed();
 
     address public owner;
     address public authorizedAgent;
+    address public settlementToken;
     uint256 public vetoWindow;
     uint256 public spendLimit;
     uint256 public nextPaymentId;
@@ -47,7 +63,8 @@ contract RageQuitEscrow {
         address indexed recipient,
         uint256 amount,
         uint256 unlocksAt,
-        bytes32 intentHash
+        bytes32 intentHash,
+        bytes32 fundingReference
     );
     event PaymentVetoed(
         uint256 indexed paymentId,
@@ -69,11 +86,13 @@ contract RageQuitEscrow {
         address recipient,
         uint256 amount,
         bytes32 intentHash,
+        bytes32 fundingReference,
         uint256 timestamp
     );
     event ConfigUpdated(
         address indexed owner,
         address indexed authorizedAgent,
+        address indexed settlementToken,
         uint256 vetoWindow,
         uint256 spendLimit
     );
@@ -92,39 +111,82 @@ contract RageQuitEscrow {
         address _owner,
         address _authorizedAgent,
         uint256 _vetoWindow,
-        uint256 _spendLimit
+        uint256 _spendLimit,
+        address _settlementToken
     ) {
-        if (_owner == address(0) || _authorizedAgent == address(0))
+        if (_owner == address(0) || _authorizedAgent == address(0)) {
             revert InvalidAddress();
+        }
         if (_spendLimit == 0) revert InvalidAmount();
 
         owner = _owner;
         authorizedAgent = _authorizedAgent;
+        settlementToken = _settlementToken;
         vetoWindow = _vetoWindow;
         spendLimit = _spendLimit;
 
-        emit ConfigUpdated(owner, authorizedAgent, vetoWindow, spendLimit);
+        emit ConfigUpdated(
+            owner,
+            authorizedAgent,
+            settlementToken,
+            vetoWindow,
+            spendLimit
+        );
     }
 
-    receive() external payable {}
+    receive() external payable {
+        if (settlementToken != address(0)) revert InvalidFundingMode();
+    }
 
-    function fund() external payable onlyOwner {}
+    function fund() external payable onlyOwner {
+        if (settlementToken != address(0)) revert InvalidFundingMode();
+    }
+
+    function fundToken(uint256 amount) external onlyOwner {
+        if (settlementToken == address(0)) revert InvalidFundingMode();
+        if (amount == 0) revert InvalidAmount();
+
+        bool success = IERC20Minimal(settlementToken).transferFrom(
+            msg.sender,
+            address(this),
+            amount
+        );
+        if (!success) revert TokenTransferFailed();
+    }
 
     function setAuthorizedAgent(address newAuthorizedAgent) external onlyOwner {
         if (newAuthorizedAgent == address(0)) revert InvalidAddress();
         authorizedAgent = newAuthorizedAgent;
-        emit ConfigUpdated(owner, authorizedAgent, vetoWindow, spendLimit);
+        emit ConfigUpdated(
+            owner,
+            authorizedAgent,
+            settlementToken,
+            vetoWindow,
+            spendLimit
+        );
     }
 
     function setVetoWindow(uint256 newVetoWindow) external onlyOwner {
         vetoWindow = newVetoWindow;
-        emit ConfigUpdated(owner, authorizedAgent, vetoWindow, spendLimit);
+        emit ConfigUpdated(
+            owner,
+            authorizedAgent,
+            settlementToken,
+            vetoWindow,
+            spendLimit
+        );
     }
 
     function setSpendLimit(uint256 newSpendLimit) external onlyOwner {
         if (newSpendLimit == 0) revert InvalidAmount();
         spendLimit = newSpendLimit;
-        emit ConfigUpdated(owner, authorizedAgent, vetoWindow, spendLimit);
+        emit ConfigUpdated(
+            owner,
+            authorizedAgent,
+            settlementToken,
+            vetoWindow,
+            spendLimit
+        );
     }
 
     function initiate(
@@ -132,6 +194,24 @@ contract RageQuitEscrow {
         uint256 amount,
         bytes32 intentHash
     ) external onlyAuthorizedAgent returns (uint256 paymentId) {
+        return _initiate(recipient, amount, intentHash, bytes32(0));
+    }
+
+    function initiateWithFundingReference(
+        address recipient,
+        uint256 amount,
+        bytes32 intentHash,
+        bytes32 fundingReference
+    ) external onlyAuthorizedAgent returns (uint256 paymentId) {
+        return _initiate(recipient, amount, intentHash, fundingReference);
+    }
+
+    function _initiate(
+        address recipient,
+        uint256 amount,
+        bytes32 intentHash,
+        bytes32 fundingReference
+    ) internal returns (uint256 paymentId) {
         if (recipient == address(0)) revert InvalidRecipient();
         if (amount == 0) revert InvalidAmount();
         if (amount > spendLimit) revert SpendLimitExceeded();
@@ -147,6 +227,7 @@ contract RageQuitEscrow {
             amount: amount,
             unlocksAt: unlocksAt,
             intentHash: intentHash,
+            fundingReference: fundingReference,
             vetoed: false,
             executed: false
         });
@@ -159,7 +240,8 @@ contract RageQuitEscrow {
             recipient,
             amount,
             unlocksAt,
-            intentHash
+            intentHash,
+            fundingReference
         );
         emit PaymentDecisionLogged(
             paymentId,
@@ -169,6 +251,7 @@ contract RageQuitEscrow {
             recipient,
             amount,
             intentHash,
+            fundingReference,
             block.timestamp
         );
     }
@@ -192,6 +275,7 @@ contract RageQuitEscrow {
             payment.recipient,
             payment.amount,
             payment.intentHash,
+            payment.fundingReference,
             block.timestamp
         );
     }
@@ -206,8 +290,16 @@ contract RageQuitEscrow {
         payment.executed = true;
         lockedBalance -= payment.amount;
 
-        (bool success, ) = payment.recipient.call{value: payment.amount}("");
-        if (!success) revert TransferFailed();
+        if (settlementToken == address(0)) {
+            (bool success, ) = payment.recipient.call{value: payment.amount}("");
+            if (!success) revert TransferFailed();
+        } else {
+            bool success = IERC20Minimal(settlementToken).transfer(
+                payment.recipient,
+                payment.amount
+            );
+            if (!success) revert TokenTransferFailed();
+        }
 
         emit PaymentExecuted(
             paymentId,
@@ -224,12 +316,17 @@ contract RageQuitEscrow {
             payment.recipient,
             payment.amount,
             payment.intentHash,
+            payment.fundingReference,
             block.timestamp
         );
     }
 
     function availableBalance() public view returns (uint256) {
-        return address(this).balance - lockedBalance;
+        uint256 grossBalance = settlementToken == address(0)
+            ? address(this).balance
+            : IERC20Minimal(settlementToken).balanceOf(address(this));
+
+        return grossBalance - lockedBalance;
     }
 
     function canExecute(uint256 paymentId) external view returns (bool) {

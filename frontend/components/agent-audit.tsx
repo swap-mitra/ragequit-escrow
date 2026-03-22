@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useState } from "react";
 
@@ -17,19 +17,58 @@ type AgentCard = {
     agentRegistry: string;
   }>;
   supportedTrust?: string[];
+  identities?: {
+    agentEnsName?: string | null;
+    ownerEnsName?: string | null;
+    authorizedAgentEnsName?: string | null;
+    self?: {
+      enabled?: boolean;
+      verified?: boolean;
+      proofUrl?: string | null;
+      scope?: string | null;
+    };
+  };
+  paymentRail?: {
+    provider?: string | null;
+    network?: string | null;
+    assetSymbol?: string | null;
+    walletAddress?: string | null;
+    walletLabel?: string | null;
+    policyUrl?: string | null;
+  };
 };
 
 type AgentLog = {
   generatedAt: string;
   authorizedAgent: string;
+  authorizedAgentLabel?: string | null;
   owner: string;
+  ownerLabel?: string | null;
   spendLimitWei: string;
   vetoWindowSeconds: string;
+  paymentRail?: {
+    provider?: string | null;
+    network?: string | null;
+    assetSymbol?: string | null;
+    walletAddress?: string | null;
+    walletLabel?: string | null;
+    policyUrl?: string | null;
+  };
+  identities?: {
+    self?: {
+      enabled?: boolean;
+      verified?: boolean;
+      proofUrl?: string | null;
+      scope?: string | null;
+    };
+  };
   decisions: Array<{
     paymentId: string;
     decisionLabel: string;
     actor: string;
+    actorLabel?: string | null;
     recipient: string;
+    recipientLabel?: string | null;
     amountWei: string;
     timestamp: string;
     transactionHash: string;
@@ -39,6 +78,7 @@ type AgentLog = {
     status: string;
     task: string;
     recipient: string;
+    recipientLabel?: string | null;
     amountWei: string;
     paymentId: string | null;
     transactionHash: string | null;
@@ -115,6 +155,8 @@ export function AgentAudit() {
 
   const latestDecisionCount = agentLog.decisions.length;
   const riskEntries = (agentLog.riskDecisions || []).slice(-4).reverse();
+  const rail = agentCard.paymentRail || agentLog.paymentRail;
+  const selfIdentity = agentCard.identities?.self || agentLog.identities?.self;
 
   return (
     <div className="audit-compact-grid">
@@ -131,11 +173,11 @@ export function AgentAudit() {
         <div className="metric-strip compact-strip">
           <div className="metric-box">
             <span className="metric-label">Agent</span>
-            <strong>{shortAddress(agentLog.authorizedAgent)}</strong>
+            <strong>{agentLog.authorizedAgentLabel || shortAddress(agentLog.authorizedAgent)}</strong>
           </div>
           <div className="metric-box">
             <span className="metric-label">Owner</span>
-            <strong>{shortAddress(agentLog.owner)}</strong>
+            <strong>{agentLog.ownerLabel || shortAddress(agentLog.owner)}</strong>
           </div>
           <div className="metric-box">
             <span className="metric-label">Spend Limit</span>
@@ -153,6 +195,42 @@ export function AgentAudit() {
               {trust}
             </span>
           ))}
+        </div>
+
+        <div className="audit-log-list compact-log-list">
+          {agentCard.identities?.agentEnsName ? <div className="audit-log-item brutal-item"><div className="subtle">Agent ENS</div><strong>{agentCard.identities.agentEnsName}</strong></div> : null}
+          {agentCard.identities?.ownerEnsName ? <div className="audit-log-item brutal-item"><div className="subtle">Owner ENS</div><strong>{agentCard.identities.ownerEnsName}</strong></div> : null}
+          {selfIdentity?.enabled ? (
+            <div className="audit-log-item brutal-item">
+              <div className="log-topline">
+                <strong>Self Identity</strong>
+                <span className={selfIdentity.verified ? "status-chip status-executed" : "status-chip status-pending"}>
+                  {selfIdentity.verified ? "Verified" : "Pending"}
+                </span>
+              </div>
+              <div className="subtle">{selfIdentity.scope || "operator verification"}</div>
+              {selfIdentity.proofUrl ? (
+                <a href={selfIdentity.proofUrl} rel="noreferrer" target="_blank">
+                  View proof
+                </a>
+              ) : null}
+            </div>
+          ) : null}
+          {rail?.provider ? (
+            <div className="audit-log-item brutal-item">
+              <div className="log-topline">
+                <strong>Payment Rail</strong>
+                <span className="status-chip status-pending">{rail.provider}</span>
+              </div>
+              <div className="subtle">{[rail.network, rail.assetSymbol].filter(Boolean).join(" · ")}</div>
+              <div className="subtle">{rail.walletLabel || rail.walletAddress || "escrow-settled"}</div>
+              {rail.policyUrl ? (
+                <a href={rail.policyUrl} rel="noreferrer" target="_blank">
+                  Rail policy
+                </a>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <div className="service-list brutal-links">
@@ -183,7 +261,7 @@ export function AgentAudit() {
                   <strong>#{entry.paymentId}</strong>
                   <span className="status-chip status-executed">{entry.decisionLabel}</span>
                 </div>
-                <div className="subtle">{shortAddress(entry.actor)} -&gt; {shortAddress(entry.recipient)}</div>
+                <div className="subtle">{entry.actorLabel || shortAddress(entry.actor)} -&gt; {entry.recipientLabel || shortAddress(entry.recipient)}</div>
                 <div className="subtle">{compactWei(entry.amountWei)}</div>
               </div>
             ))}
@@ -217,7 +295,7 @@ export function AgentAudit() {
                   </strong>
                 </div>
                 <div className="subtle">{entry.task}</div>
-                <div className="subtle">{shortAddress(agentLog.authorizedAgent)} -&gt; {shortAddress(entry.recipient)}</div>
+                <div className="subtle">{agentLog.authorizedAgentLabel || shortAddress(agentLog.authorizedAgent)} -&gt; {entry.recipientLabel || shortAddress(entry.recipient)}</div>
                 <div className="subtle">{compactWei(entry.amountWei)}</div>
                 <div className="subtle">{entry.reasons.join("; ")}</div>
               </div>
@@ -252,3 +330,4 @@ function compactWei(raw: string) {
 
   return `${raw.slice(0, 4)}...${raw.slice(-4)} wei`;
 }
+

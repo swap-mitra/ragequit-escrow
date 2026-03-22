@@ -1,27 +1,33 @@
 {
-  "name": "ragequit-escrow",
-  "version": "0.1.0",
-  "private": true,
-  "workspaces": [
-    "contracts",
-    "frontend"
-  ],
-  "scripts": {
-    "contracts:compile": "npm --workspace contracts run compile",
-    "contracts:test": "npm --workspace contracts run test",
-    "contracts:node": "npm --workspace contracts run node",
-    "contracts:deploy:local": "npm --workspace contracts run deploy:local",
-    "contracts:deploy:sepolia": "npm --workspace contracts run deploy:sepolia",
-    "contracts:artifacts:local": "npm --workspace contracts run artifacts:local",
-    "contracts:artifacts:sepolia": "npm --workspace contracts run artifacts:sepolia",
-    "contracts:delegations:local": "npm --workspace contracts run delegations:local",
-    "contracts:delegations:sepolia": "npm --workspace contracts run delegations:sepolia",
-    "contracts:run-agent:local": "npm --workspace contracts run run-agent:local",
-    "contracts:run-agent:sepolia": "npm --workspace contracts run run-agent:sepolia",
-    "contracts:keeper": "npm --workspace contracts run keeper",
-    "contracts:watch:telegram:local": "npm --workspace contracts run watch:telegram:local",
-    "contracts:watch:telegram:sepolia": "npm --workspace contracts run watch:telegram:sepolia",
-    "frontend:dev": "npm --workspace frontend run dev",
-    "frontend:build": "npm --workspace frontend run build"
-  }
+    "name":  "ragequit-escrow",
+    "version":  "0.1.0",
+    "private":  true,
+    "workspaces":  [
+                       "contracts",
+                       "frontend"
+                   ],
+    "scripts":  {
+                    "contracts:compile":  "npm --workspace contracts run compile",
+                    "contracts:test":  "npm --workspace contracts run test",
+                    "contracts:node":  "npm --workspace contracts run node",
+                    "contracts:deploy:local":  "npm --workspace contracts run deploy:local",
+                    "contracts:deploy:sepolia":  "npm --workspace contracts run deploy:sepolia",
+                    "contracts:artifacts:local":  "npm --workspace contracts run artifacts:local",
+                    "contracts:artifacts:sepolia":  "npm --workspace contracts run artifacts:sepolia",
+                    "contracts:delegations:local":  "npm --workspace contracts run delegations:local",
+                    "contracts:delegations:sepolia":  "npm --workspace contracts run delegations:sepolia",
+                    "contracts:run-agent:local":  "npm --workspace contracts run run-agent:local",
+                    "contracts:run-agent:sepolia":  "npm --workspace contracts run run-agent:sepolia",
+                    "contracts:keeper":  "npm --workspace contracts run keeper",
+                    "contracts:watch:telegram:local":  "npm --workspace contracts run watch:telegram:local",
+                    "contracts:watch:telegram:sepolia":  "npm --workspace contracts run watch:telegram:sepolia",
+                    "frontend:dev":  "npm --workspace frontend run dev",
+                    "frontend:build":  "npm --workspace frontend run build",
+                    "contracts:deploy:alfajores":  "npm --workspace contracts run deploy:alfajores",
+                    "contracts:artifacts:alfajores":  "npm --workspace contracts run artifacts:alfajores",
+                    "contracts:delegations:alfajores":  "npm --workspace contracts run delegations:alfajores",
+                    "contracts:run-agent:alfajores":  "npm --workspace contracts run run-agent:alfajores",
+                    "contracts:keeper:alfajores":  "npm --workspace contracts run keeper:alfajores",
+                    "contracts:watch:telegram:alfajores":  "npm --workspace contracts run watch:telegram:alfajores"
+                }
 }
