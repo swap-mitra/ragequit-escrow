@@ -29,5 +29,30 @@
   "supportedTrust": [
     "reputation",
     "validation"
-  ]
+  ],
+  "identities": {
+    "agentEnsName": null,
+    "ownerEnsName": null,
+    "authorizedAgentEnsName": null,
+    "recipientEns": {},
+    "addressBook": {},
+    "self": {
+      "enabled": false,
+      "userId": null,
+      "scope": null,
+      "proofUrl": null,
+      "verified": false,
+      "attestation": null
+    }
+  },
+  "paymentRail": {
+    "provider": "erc20-escrow",
+    "network": "localhost",
+    "assetSymbol": null,
+    "assetAddress": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+    "walletAddress": null,
+    "walletLabel": null,
+    "policyUrl": null,
+    "notes": null
+  }
 }

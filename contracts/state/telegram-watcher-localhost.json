@@ -1,0 +1,103 @@
+{
+  "lastProcessedBlock": 678,
+  "lastTelegramUpdateId": 376895293,
+  "telegramWebhookCleared": false,
+  "paymentMessages": {
+    "0": {
+      "paymentId": "0",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774243460,
+      "txHash": "0xa8a3a5d4f5e168e5432ce6cf58a61dc8c990864ef2c533970b9ed145d10e5edf",
+      "status": "paymentexecuted",
+      "chatId": "975972651",
+      "messageId": 7,
+      "lastTimerBucket": "closed"
+    },
+    "1": {
+      "paymentId": "1",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774243951,
+      "txHash": "0x493d2afe3692d65db7364a3e5435fa1af26fe723aa1c94e87e6ea9b3859cbad4",
+      "status": "paymentvetoed",
+      "chatId": "975972651",
+      "messageId": 9,
+      "lastTimerBucket": "closed"
+    },
+    "2": {
+      "paymentId": "2",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774244380,
+      "txHash": "0xce2ecfd89ec15ff229c6563dd3bef3276624fda5cd4dd30d2eb51032b88501b1",
+      "status": "paymentexecuted",
+      "chatId": "975972651",
+      "messageId": 11,
+      "lastTimerBucket": "closed"
+    },
+    "3": {
+      "paymentId": "3",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774244536,
+      "txHash": "0xd23cef7f202256bf6561c2d01f49c5a8e222d1419e775f985ec6b70cab4d670b",
+      "status": "paymentvetoed",
+      "chatId": "975972651",
+      "messageId": 13,
+      "lastTimerBucket": "closed"
+    },
+    "4": {
+      "paymentId": "4",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774244727,
+      "txHash": "0xeada1a48e6ea286b26c568145c8614cfa38126dceb2d142fa27ad2a5b054f4b9",
+      "status": "paymentexecuted",
+      "chatId": "975972651",
+      "messageId": 14,
+      "lastTimerBucket": "closed"
+    },
+    "5": {
+      "paymentId": "5",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774246914,
+      "txHash": "0x13d71a1efd808a60cb0a1abdcd288a067c3d9761430a46694797d38bae195ac0",
+      "status": "paymentexecuted",
+      "chatId": "975972651",
+      "messageId": 15,
+      "lastTimerBucket": "closed"
+    },
+    "6": {
+      "paymentId": "6",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774247037,
+      "txHash": "0x70c16257d537ceb8f03e6159b8025dae7d43daf4f9de5de0d1b6d6a80f2a50ca",
+      "status": "paymentvetoed",
+      "chatId": "975972651",
+      "messageId": 16,
+      "lastTimerBucket": "closed"
+    },
+    "7": {
+      "paymentId": "7",
+      "agent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "amountWei": "100000000000000000",
+      "unlocksAt": 1774247065,
+      "txHash": "0x3deb1118f01407b88caa2e2eb71cfb2e11e64c82817a98db382d6ad8ef0fea86",
+      "status": "paymentvetoed",
+      "chatId": "975972651",
+      "messageId": 17,
+      "lastTimerBucket": "closed"
+    }
+  }
+}

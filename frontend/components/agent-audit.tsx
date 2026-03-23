@@ -90,6 +90,46 @@ type AgentLog = {
   }>;
 };
 
+function describeUnknownError(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (typeof error === "string" && error.trim()) {
+    return error;
+  }
+
+  if (typeof error === "object" && error !== null) {
+    if ("message" in error && typeof (error as { message?: unknown }).message === "string") {
+      return (error as { message: string }).message;
+    }
+
+    const constructorName = (error as { constructor?: { name?: string } }).constructor?.name;
+    if (constructorName && constructorName !== "Object") {
+      return `${fallback} (${constructorName})`;
+    }
+  }
+
+  return fallback;
+}
+
+async function parseJsonResponse(response: Response) {
+  const raw = await response.text();
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    if (!response.ok) {
+      throw new Error(raw);
+    }
+
+    throw new Error("Artifact refresh returned a non-JSON response.");
+  }
+}
+
 export function AgentAudit() {
   const [agentCard, setAgentCard] = useState<AgentCard | null>(null);
   const [agentLog, setAgentLog] = useState<AgentLog | null>(null);
@@ -114,7 +154,7 @@ export function AgentAudit() {
       setAgentLog(log);
       setError(null);
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Unable to load agent artifacts.");
+      setError(describeUnknownError(loadError, "Unable to load agent artifacts."));
     }
   }, []);
 
@@ -130,16 +170,20 @@ export function AgentAudit() {
       const response = await fetch("/api/audit-artifacts/refresh", {
         method: "POST",
       });
-      const payload = await response.json();
+      const payload = await parseJsonResponse(response);
 
       if (!response.ok) {
-        throw new Error(payload.error || "Artifact refresh failed.");
+        throw new Error(
+          typeof payload.error === "string" && payload.error.trim()
+            ? payload.error
+            : "Artifact refresh failed."
+        );
       }
 
       await loadArtifacts();
       setRefreshMessage(`Artifacts refreshed for ${payload.network}.`);
     } catch (refreshError) {
-      setRefreshMessage(refreshError instanceof Error ? refreshError.message : "Artifact refresh failed.");
+      setRefreshMessage(describeUnknownError(refreshError, "Artifact refresh failed."));
     } finally {
       setRefreshState("idle");
     }

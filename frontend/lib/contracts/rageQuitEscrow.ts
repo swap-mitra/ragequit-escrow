@@ -23,6 +23,7 @@ export const rageQuitEscrowAbi = [
       { "name": "amount", "type": "uint256", "internalType": "uint256" },
       { "name": "unlocksAt", "type": "uint256", "internalType": "uint256" },
       { "name": "intentHash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "fundingReference", "type": "bytes32", "internalType": "bytes32" },
       { "name": "vetoed", "type": "bool", "internalType": "bool" },
       { "name": "executed", "type": "bool", "internalType": "bool" }
     ],

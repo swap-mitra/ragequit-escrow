@@ -231,6 +231,1218 @@
       "paymentId": null,
       "transactionHash": null,
       "blockNumber": null
+    },
+    {
+      "createdAt": "2026-03-23T04:59:07.655Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay vendor invoice 42",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0x4a34827485325042bd9ed2790791b56b1bdf4c45f628a0fbd9de2706cfb3338a",
+      "intent": {
+        "version": 1,
+        "task": "Pay vendor invoice 42",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T04:59:07.655Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "0",
+      "transactionHash": "0xbf1888bc17cf9819b3e1e06325381344b4aa93f51f461eecc5ee474bdc59d60f",
+      "blockNumber": 3
+    },
+    {
+      "createdAt": "2026-03-23T05:09:35.063Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay vendor invoice 42",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0x4abea70abfd1e482d37e874df1c7575386579f55487656db5cdd3d9d9580101a",
+      "intent": {
+        "version": 1,
+        "task": "Pay vendor invoice 42",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T05:09:35.063Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "1",
+      "transactionHash": "0x7c5b9f7298e5286c1d6bfe999a40e004a8faf778cc980941cc9392fb85cce6e3",
+      "blockNumber": 5
+    },
+    {
+      "createdAt": "2026-03-23T05:17:36.204Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay vendor invoice 42",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0x9ff2586721465de0e1d705ba839aeabdf10c12c0307946283c0dc0977137a1b2",
+      "intent": {
+        "version": 1,
+        "task": "Pay vendor invoice 42",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T05:17:36.204Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "2",
+      "transactionHash": "0x563739794576734b2cace6fc9bd2c0d44fd358fcad4545350c93675c4342c47d",
+      "blockNumber": 7
+    },
+    {
+      "createdAt": "2026-03-23T05:23:20.569Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay vendor invoice 42",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0xabd5bc0cca3448cd697ceef724901d504fd218df9a4da3f7fb896910ebe24872",
+      "intent": {
+        "version": 1,
+        "task": "Pay vendor invoice 42",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T05:23:20.569Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "0",
+      "transactionHash": "0xa8a3a5d4f5e168e5432ce6cf58a61dc8c990864ef2c533970b9ed145d10e5edf",
+      "blockNumber": 5
+    },
+    {
+      "createdAt": "2026-03-23T05:31:30.363Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 30,
+        "riskThreshold": 70,
+        "reasons": [
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0x15914e852bd71784bffb26c152cf553579203f1998cc82a7f95fcdec4d70b467",
+      "intent": {
+        "version": 1,
+        "task": "Urgent override payment to unknown wallet",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T05:31:30.363Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "1",
+      "transactionHash": "0x493d2afe3692d65db7364a3e5435fa1af26fe723aa1c94e87e6ea9b3859cbad4",
+      "blockNumber": 56
+    },
+    {
+      "createdAt": "2026-03-23T05:38:38.101Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay vendor invoice 42",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0xdf0f346e5d07ba3eef3ec1438e996265d9dc5f5d2f3aa85d0e80a449841a2e0a",
+      "intent": {
+        "version": 1,
+        "task": "Pay vendor invoice 42",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T05:38:38.101Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "2",
+      "transactionHash": "0xce2ecfd89ec15ff229c6563dd3bef3276624fda5cd4dd30d2eb51032b88501b1",
+      "blockNumber": 101
+    },
+    {
+      "createdAt": "2026-03-23T05:41:13.022Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Pay vendor invoice 42",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0x7884053ca9dca5ab2d1daed0618d70743c9799ed0c5df0a549c88d251637e2d9",
+      "intent": {
+        "version": 1,
+        "task": "Pay vendor invoice 42",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T05:41:13.022Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Pay vendor invoice 42",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "3",
+      "transactionHash": "0xd23cef7f202256bf6561c2d01f49c5a8e222d1419e775f985ec6b70cab4d670b",
+      "blockNumber": 118
+    },
+    {
+      "createdAt": "2026-03-23T05:44:24.084Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 30,
+        "riskThreshold": 70,
+        "reasons": [
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0xa80397fb852e1b5e478daaf92cebcf2435fa12774452ba4872f8754023e6b66e",
+      "intent": {
+        "version": 1,
+        "task": "Urgent override payment to unknown wallet",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T05:44:24.084Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "4",
+      "transactionHash": "0xeada1a48e6ea286b26c568145c8614cfa38126dceb2d142fa27ad2a5b054f4b9",
+      "blockNumber": 139
+    },
+    {
+      "createdAt": "2026-03-23T05:45:49.460Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "block_payment",
+        "riskScore": 120,
+        "riskThreshold": 70,
+        "reasons": [
+          "recipient is on local blocked-recipient list",
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "blocked_by_risk",
+      "intentHash": null,
+      "intent": null,
+      "paymentId": null,
+      "transactionHash": null,
+      "blockNumber": null
+    },
+    {
+      "createdAt": "2026-03-23T06:20:50.015Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 30,
+        "riskThreshold": 70,
+        "reasons": [
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0x87546253d1f3dcf8b0f1a4f5c99f50b87e135e09ba7b2c1b3afd5da4395286a9",
+      "intent": {
+        "version": 1,
+        "task": "Urgent override payment to unknown wallet",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T06:20:50.015Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "5",
+      "transactionHash": "0x13d71a1efd808a60cb0a1abdcd288a067c3d9761430a46694797d38bae195ac0",
+      "blockNumber": 359
+    },
+    {
+      "createdAt": "2026-03-23T06:22:52.691Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 30,
+        "riskThreshold": 70,
+        "reasons": [
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0xedc05c3e03f4cd0b20e78cb77f804f84c41aafc919ecbf47c9705abba3dc4f4d",
+      "intent": {
+        "version": 1,
+        "task": "Urgent override payment to unknown wallet",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T06:22:52.691Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "6",
+      "transactionHash": "0x70c16257d537ceb8f03e6159b8025dae7d43daf4f9de5de0d1b6d6a80f2a50ca",
+      "blockNumber": 373
+    },
+    {
+      "createdAt": "2026-03-23T06:23:20.526Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 30,
+        "riskThreshold": 70,
+        "reasons": [
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "native",
+      "settlementToken": "0x0000000000000000000000000000000000000000",
+      "fundingMode": "native",
+      "fundingReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "fundingDetails": null,
+      "intentHash": "0xfe38caa6efaff1cd034fb9223c1436f680b53bbccc832f3eda22dabc533a2d46",
+      "intent": {
+        "version": 1,
+        "task": "Urgent override payment to unknown wallet",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "100000000000000000",
+        "network": "localhost",
+        "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "createdAt": "2026-03-23T06:23:20.526Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=100000000000000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "7",
+      "transactionHash": "0x3deb1118f01407b88caa2e2eb71cfb2e11e64c82817a98db382d6ad8ef0fea86",
+      "blockNumber": 378
+    },
+    {
+      "createdAt": "2026-03-23T06:24:58.560Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "block_payment",
+        "riskScore": 120,
+        "riskThreshold": 70,
+        "reasons": [
+          "recipient is on local blocked-recipient list",
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "blocked_by_risk",
+      "intentHash": null,
+      "intent": null,
+      "paymentId": null,
+      "transactionHash": null,
+      "blockNumber": null
+    },
+    {
+      "createdAt": "2026-03-23T06:29:44.266Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "block_payment",
+        "riskScore": 120,
+        "riskThreshold": 70,
+        "reasons": [
+          "recipient is on local blocked-recipient list",
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "blocked_by_risk",
+      "intentHash": null,
+      "intent": null,
+      "paymentId": null,
+      "transactionHash": null,
+      "blockNumber": null
+    },
+    {
+      "createdAt": "2026-03-23T06:58:07.267Z",
+      "network": "localhost",
+      "escrowAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+      "recipientLabel": null,
+      "amountWei": "100000000000000000",
+      "paymentRail": {
+        "provider": "native-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0000000000000000000000000000000000000000",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+          "amountWei=100000000000000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "block_payment",
+        "riskScore": 120,
+        "riskThreshold": 70,
+        "reasons": [
+          "recipient is on local blocked-recipient list",
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "blocked_by_risk",
+      "intentHash": null,
+      "intent": null,
+      "paymentId": null,
+      "transactionHash": null,
+      "blockNumber": null
+    },
+    {
+      "createdAt": "2026-03-23T07:02:23.701Z",
+      "network": "localhost",
+      "escrowAddress": "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Urgent override payment to unknown wallet",
+      "recipient": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+      "recipientLabel": null,
+      "amountWei": "125000000",
+      "paymentRail": {
+        "provider": "erc20-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Urgent override payment to unknown wallet",
+        "checks": [
+          "recipient=0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+          "amountWei=125000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "block_payment",
+        "riskScore": 120,
+        "riskThreshold": 70,
+        "reasons": [
+          "recipient is on local blocked-recipient list",
+          "task matched suspicious keywords: urgent, override, unknown"
+        ]
+      },
+      "status": "blocked_by_risk",
+      "intentHash": null,
+      "intent": null,
+      "paymentId": null,
+      "transactionHash": null,
+      "blockNumber": null
+    },
+    {
+      "createdAt": "2026-03-23T07:06:32.350Z",
+      "network": "localhost",
+      "escrowAddress": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Swap then pay vendor invoice",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "125000000",
+      "paymentRail": {
+        "provider": "erc20-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Swap then pay vendor invoice",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=125000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "token",
+      "settlementToken": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      "fundingMode": "swap-native",
+      "fundingReference": "0x3405d2c03235c73818b43805b18aef1c645badd8c21020493f37eaa9f2689c75",
+      "fundingDetails": {
+        "routerKind": "mock",
+        "swapRouterAddress": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+        "swapQuoteId": "0x3405d2c03235c73818b43805b18aef1c645badd8c21020493f37eaa9f2689c75",
+        "swapTransactionHash": "0xedf5a9346667fbe5c4d58d301df1f53423c42f422815b6ff0b287428b9578c58",
+        "swapBlockNumber": 646,
+        "nativeAmountInWei": "200000000000000000",
+        "quotedAmountOut": "200000000000000000000",
+        "minAmountOut": "125000000"
+      },
+      "intentHash": "0xf1b7c7aa19355dd731866acf66868a844e239337dd3ab4a936221cdb85c495bc",
+      "intent": {
+        "version": 1,
+        "task": "Swap then pay vendor invoice",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "125000000",
+        "network": "localhost",
+        "escrowAddress": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+        "createdAt": "2026-03-23T07:06:32.350Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Swap then pay vendor invoice",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=125000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "0",
+      "transactionHash": "0xc032c6a44be3de207c4f27eb7a176157333482f4f5f6f2eef21b68bb4bfa8dfe",
+      "blockNumber": 647
+    },
+    {
+      "createdAt": "2026-03-23T07:10:12.279Z",
+      "network": "localhost",
+      "escrowAddress": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      "authorizedAgent": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+      "task": "Swap then pay vendor invoice",
+      "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      "recipientLabel": null,
+      "amountWei": "125000000",
+      "paymentRail": {
+        "provider": "erc20-escrow",
+        "network": "localhost",
+        "assetSymbol": null,
+        "assetAddress": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+        "walletAddress": null,
+        "walletLabel": null,
+        "policyUrl": null,
+        "notes": null
+      },
+      "reasoning": {
+        "provider": "local-deterministic",
+        "summary": "Queue a revocable payment for task: Swap then pay vendor invoice",
+        "checks": [
+          "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+          "amountWei=125000000",
+          "network=localhost",
+          "route-through-escrow=true"
+        ],
+        "recommendedAction": "queue_payment",
+        "confidence": "medium"
+      },
+      "riskAssessment": {
+        "provider": "local-risk",
+        "private": true,
+        "verdict": "queue_payment",
+        "riskScore": 10,
+        "riskThreshold": 70,
+        "reasons": [
+          "no elevated local risk signals triggered"
+        ]
+      },
+      "status": "queued_onchain",
+      "settlementMode": "token",
+      "settlementToken": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      "fundingMode": "swap-native",
+      "fundingReference": "0x9dc959d687287d1788564fa41ab4fc13273e69721a40873af6c67113ab5a7fb7",
+      "fundingDetails": {
+        "routerKind": "mock",
+        "swapRouterAddress": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+        "swapQuoteId": "0x9dc959d687287d1788564fa41ab4fc13273e69721a40873af6c67113ab5a7fb7",
+        "swapTransactionHash": "0x89291ec22d5e504e6e1b40afad1e274e59d45089a364abf8c82d1e04e2e41bc9",
+        "swapBlockNumber": 670,
+        "nativeAmountInWei": "200000000000000000",
+        "quotedAmountOut": "200000000000000000000",
+        "minAmountOut": "125000000"
+      },
+      "intentHash": "0xa37ea7bd4f449ac4c9698dfce4088ede64b2224d745e757a19420229cab0c370",
+      "intent": {
+        "version": 1,
+        "task": "Swap then pay vendor invoice",
+        "recipient": "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+        "amountWei": "125000000",
+        "network": "localhost",
+        "escrowAddress": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+        "createdAt": "2026-03-23T07:10:12.279Z",
+        "reasoning": {
+          "provider": "local-deterministic",
+          "summary": "Queue a revocable payment for task: Swap then pay vendor invoice",
+          "checks": [
+            "recipient=0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+            "amountWei=125000000",
+            "network=localhost",
+            "route-through-escrow=true"
+          ],
+          "recommendedAction": "queue_payment",
+          "confidence": "medium"
+        }
+      },
+      "paymentId": "1",
+      "transactionHash": "0xdc2a909eb4ee4c822b170207f1766d5d238eb03f29a30c7f451589eac711416c",
+      "blockNumber": 671
     }
   ]
 }

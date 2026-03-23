@@ -22,10 +22,24 @@ function resolveEscrowAddress(networkName) {
 }
 
 async function runKeeperPass(escrow, runner) {
-  const now = Math.floor(Date.now() / 1000);
+  const provider = hre.ethers.provider;
+  const networkName = hre.network.name;
   const maxScan = Number(process.env.KEEPER_MAX_SCAN || "50");
+
+  if (networkName === "localhost" || networkName === "hardhat") {
+    await provider.send("evm_mine", []);
+  }
+
+  const latestBlock = await provider.getBlock("latest");
+  if (!latestBlock) {
+    throw new Error("Unable to load the latest block while running keeper.");
+  }
+
+  const now = Number(latestBlock.timestamp);
   const nextPaymentId = Number(await escrow.nextPaymentId());
   const firstPaymentId = Math.max(0, nextPaymentId - maxScan);
+
+  console.log(`Keeper scan at chain time ${new Date(now * 1000).toISOString()} (${now})`);
 
   for (let id = firstPaymentId; id < nextPaymentId; id += 1) {
     const payment = await escrow.pendingPayments(id);
@@ -35,6 +49,7 @@ async function runKeeperPass(escrow, runner) {
     }
 
     if (payment.unlocksAt > BigInt(now)) {
+      console.log(`Skipping payment ${id}; unlocks at ${payment.unlocksAt.toString()}.`);
       continue;
     }
 

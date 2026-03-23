@@ -250,7 +250,7 @@ button[disabled] {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -380,6 +380,7 @@ button[disabled] {
 
 .audit-compact-grid {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -454,8 +455,11 @@ button[disabled] {
 }
 
 @media (max-width: 1080px) {
-  .hero-band,
-  .dashboard-grid {
+  .hero-band {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-compact-grid {
     grid-template-columns: 1fr;
   }
 
@@ -498,3 +502,4 @@ button[disabled] {
     min-width: 100px;
   }
 }
+
