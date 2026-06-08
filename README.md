@@ -123,7 +123,7 @@ Primary targets:
 - Protocol Labs: Let the Agent Cook
 - MetaMask: Best Use of Delegations
 
-Strong secondary targets:
+Secondary targets:
 
 - Uniswap: Agentic Finance
 - Celo: Best Agent on Celo
