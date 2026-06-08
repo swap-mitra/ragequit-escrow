@@ -175,7 +175,51 @@ Important scripts:
 
 ## Local Development
 
+<<<<<<< HEAD
 Install dependencies:
+=======
+1. An agent receives a task and constructs a payment intent.
+2. The runner hashes the intent and evaluates risk privately.
+3. If allowed, the agent queues the payment onchain instead of transferring immediately.
+4. Telegram alerts and the dashboard expose the pending payment.
+5. The owner can veto before `unlocksAt`.
+6. If not vetoed, the keeper or any caller can execute after the window closes.
+
+## Tracks Targeted
+
+Primary targets:
+
+- Synthesis Open Track
+- Protocol Labs: Agents With Receipts / ERC-8004
+- Protocol Labs: Let the Agent Cook
+- MetaMask: Best Use of Delegations
+
+Secondary targets:
+
+- Uniswap: Agentic Finance
+- Celo: Best Agent on Celo
+- Locus: Best Use of Locus
+- Venice: Private Agents, Trusted Actions
+- ENS: Identity / Communication / Open Integration
+- Self: Best Self Agent ID Integration
+- Status Network: Go Gasless
+
+How the project maps:
+
+- ERC-8004 artifacts and audit logs support the Protocol Labs trust-and-receipts story.
+- Delegation tooling supports the MetaMask permissions story.
+- Swap-backed token funding supports the Uniswap finance story.
+- Alfajores support supports the Celo stablecoin/payment story.
+- Payment rail metadata supports the Locus controlled-wallet story.
+- ENS and Self metadata support identity-focused tracks.
+- Venice risk mode supports the private-reasoning trust story.
+
+## Setup
+
+### Install
+
+1. Install dependencies:
+>>>>>>> 1eae6a9d42f0acdf6dad27836d29e9366825cd8d
 
 ```powershell
 "C:\Program Files\nodejs\npm.cmd" install
