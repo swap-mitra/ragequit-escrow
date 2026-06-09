@@ -175,54 +175,10 @@ Important scripts:
 
 ## Local Development
 
-<<<<<<< HEAD
 Install dependencies:
-=======
-1. An agent receives a task and constructs a payment intent.
-2. The runner hashes the intent and evaluates risk privately.
-3. If allowed, the agent queues the payment onchain instead of transferring immediately.
-4. Telegram alerts and the dashboard expose the pending payment.
-5. The owner can veto before `unlocksAt`.
-6. If not vetoed, the keeper or any caller can execute after the window closes.
-
-## Tracks Targeted
-
-Primary targets:
-
-- Synthesis Open Track
-- Protocol Labs: Agents With Receipts / ERC-8004
-- Protocol Labs: Let the Agent Cook
-- MetaMask: Best Use of Delegations
-
-Secondary targets:
-
-- Uniswap: Agentic Finance
-- Celo: Best Agent on Celo
-- Locus: Best Use of Locus
-- Venice: Private Agents, Trusted Actions
-- ENS: Identity / Communication / Open Integration
-- Self: Best Self Agent ID Integration
-- Status Network: Go Gasless
-
-How the project maps:
-
-- ERC-8004 artifacts and audit logs support the Protocol Labs trust-and-receipts story.
-- Delegation tooling supports the MetaMask permissions story.
-- Swap-backed token funding supports the Uniswap finance story.
-- Alfajores support supports the Celo stablecoin/payment story.
-- Payment rail metadata supports the Locus controlled-wallet story.
-- ENS and Self metadata support identity-focused tracks.
-- Venice risk mode supports the private-reasoning trust story.
-
-## Setup
-
-### Install
-
-1. Install dependencies:
->>>>>>> 1eae6a9d42f0acdf6dad27836d29e9366825cd8d
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" install
+npm install
 ```
 
 Copy environment files:
@@ -235,19 +191,19 @@ copy frontend\.env.local.example frontend\.env.local
 Run tests:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:test
+npm run contracts:test
 ```
 
 Start a local chain:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:node
+npm run contracts:node
 ```
 
 Deploy locally:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:deploy:local
+npm run contracts:deploy:local
 ```
 
 After deployment, set `NEXT_PUBLIC_ESCROW_ADDRESS` in `frontend/.env.local` from `contracts/deployments/localhost.json`.
@@ -255,7 +211,7 @@ After deployment, set `NEXT_PUBLIC_ESCROW_ADDRESS` in `frontend/.env.local` from
 Run the frontend:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run frontend:dev
+npm run frontend:dev
 ```
 
 ## Running The Agent
@@ -271,7 +227,7 @@ AGENT_AMOUNT_ETH=0.1
 Queue a payment locally:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:run-agent:local
+npm run contracts:run-agent:local
 ```
 
 The runner writes entries to `contracts/runs/localhost.json`. If `AGENT_REFRESH_ARTIFACTS=true`, it also refreshes `agent.json` and `agent_log.json`.
@@ -290,7 +246,7 @@ WATCHER_TIMER_INTERVAL_SECONDS=15
 Start the watcher:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:watch:telegram:local
+npm run contracts:watch:telegram:local
 ```
 
 The watcher supports:
@@ -308,7 +264,7 @@ For public networks, set `TELEGRAM_VETO_PRIVATE_KEY` to an owner key if the owne
 Run one keeper pass:
 
 ```powershell
-KEEPER_ONCE=true "C:\Program Files\nodejs\npm.cmd" run contracts:keeper
+KEEPER_ONCE=true npm run contracts:keeper
 ```
 
 The keeper scans recent payment IDs, skips vetoed or already executed payments, and calls `execute(paymentId)` for payments whose veto window has closed.
@@ -355,19 +311,19 @@ The resulting run log records swap/funding metadata and the `fundingReference` s
 Sepolia:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:deploy:sepolia
-"C:\Program Files\nodejs\npm.cmd" run contracts:run-agent:sepolia
-"C:\Program Files\nodejs\npm.cmd" run contracts:watch:telegram:sepolia
-"C:\Program Files\nodejs\npm.cmd" run contracts:artifacts:sepolia
+npm run contracts:deploy:sepolia
+npm run contracts:run-agent:sepolia
+npm run contracts:watch:telegram:sepolia
+npm run contracts:artifacts:sepolia
 ```
 
 Alfajores:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:deploy:alfajores
-"C:\Program Files\nodejs\npm.cmd" run contracts:run-agent:alfajores
-"C:\Program Files\nodejs\npm.cmd" run contracts:watch:telegram:alfajores
-"C:\Program Files\nodejs\npm.cmd" run contracts:artifacts:alfajores
+npm run contracts:deploy:alfajores
+npm run contracts:run-agent:alfajores
+npm run contracts:watch:telegram:alfajores
+npm run contracts:artifacts:alfajores
 ```
 
 Required environment variables vary by network. See [contracts/.env.example](/c:/projects/ragequit-escrow/contracts/.env.example) for RPC URLs, private keys, settlement settings, risk providers, and metadata options.
@@ -382,7 +338,7 @@ RageQuit Escrow maintains two layers of audit data:
 Refresh artifacts manually:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:artifacts:local
+npm run contracts:artifacts:local
 ```
 
 The frontend also includes a refresh endpoint used by the dashboard audit panel.
@@ -401,8 +357,8 @@ The frontend also includes a refresh endpoint used by the dashboard audit panel.
 Primary checks:
 
 ```powershell
-"C:\Program Files\nodejs\npm.cmd" run contracts:test
-"C:\Program Files\nodejs\npm.cmd" run frontend:build
+npm run contracts:test
+npm run frontend:build
 ```
 
 The contract tests cover queueing, authorization, spend limits, veto timing, native execution, token execution, and funding-mode validation.
